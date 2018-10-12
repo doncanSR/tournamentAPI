@@ -36,5 +36,8 @@ export const matchSchema = new Schema({
     },
     setsTeamTwo: {
         type: Number
+    }, 
+    refereeId: {
+        type: String
     }
 });
