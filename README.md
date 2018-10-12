@@ -1,11 +1,3 @@
-
-## Start the prject
-
-To start the project you shoul have had mongo and node previusly installed in your computer.
-
-You should strart the mongo server in unix is "sudo mongod" and in windows just "mongod"
-
-You should open the project in a terminal o cmd, and use "npm run dev" and this will help you to start the project 
 # Tournament API 
 
 This is the API for the Tournament APP, created in node using typescript. 
