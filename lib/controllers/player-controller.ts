@@ -15,7 +15,7 @@ export class PlayerController {
       if (err) {
         res.send(err);
       }
-      res.json(player);
+      res.status(200).json(player);
     })
   }
   /**
@@ -37,7 +37,7 @@ export class PlayerController {
       if (err) {
         res.send(err);
       }
-      res.json(player);
+      res.status(200).json(player);
     })
   }
 
@@ -46,7 +46,7 @@ export class PlayerController {
       if (err) {
         res.send(err);
       }
-      res.json(player);
+      res.status(200).json(player);
     });
   }
 
@@ -55,7 +55,7 @@ export class PlayerController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted player!' });
+      res.status(200).json({ message: 'Successfully deleted player!' });
     });
   }
 }

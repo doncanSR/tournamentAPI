@@ -15,7 +15,7 @@ export class CatFaseController {
       if (err) {
         res.send(err);
       }
-      res.json(catFase);
+      res.status(200).json(catFase);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class CatFaseController {
       if (err) {
 
       }
-      res.json(catFase);
+      res.status(200).json(catFase);
     })
   }
 
@@ -37,7 +37,7 @@ export class CatFaseController {
       if (err) {
         res.send(err);
       }
-      res.json(catFase);
+      res.status(200).json(catFase);
     })
   }
 
@@ -46,7 +46,7 @@ export class CatFaseController {
       if (err) {
         res.send(err);
       }
-      res.json(catFase);
+      res.status(200).json(catFase);
     });
   }
 
@@ -55,7 +55,7 @@ export class CatFaseController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted catFase!' });
+      res.status(200).json({ message: 'Successfully deleted catFase!' });
     });
   }
 }

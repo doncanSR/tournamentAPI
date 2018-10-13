@@ -15,7 +15,7 @@ export class MatchController {
       if (err) {
         res.send(err);
       }
-      res.json(match);
+      res.status(200).json(match);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class MatchController {
       if (err) {
 
       }
-      res.json(match);
+      res.status(200).json(match);
     })
   }
 
@@ -37,7 +37,7 @@ export class MatchController {
       if (err) {
         res.send(err);
       }
-      res.json(match);
+      res.status(200).json(match);
     })
   }
 
@@ -46,7 +46,7 @@ export class MatchController {
       if (err) {
         res.send(err);
       }
-      res.json(match);
+      res.status(200).json(match);
     });
   }
 
@@ -55,7 +55,7 @@ export class MatchController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted match!' });
+      res.status(200).json({ message: 'Successfully deleted match!' });
     });
   }
 }

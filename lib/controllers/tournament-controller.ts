@@ -12,7 +12,7 @@ export class TournamentController {
       if (err) {
         res.send(err);
       }
-      res.json(tournament);
+      res.status(200).json(tournament);
     });
   }
 
@@ -21,7 +21,7 @@ export class TournamentController {
       if (err) {
         res.send(err);
       }
-      res.json(tournaments);
+      res.status(200).json(tournaments);
     });
   }
 
@@ -30,7 +30,7 @@ export class TournamentController {
       if (err) {
         res.send(err);
       }
-      res.json(tournament);
+      res.status(200).json(tournament);
     });
   }
 
@@ -39,7 +39,7 @@ export class TournamentController {
       if (err) {
         res.send(err);
       }
-      res.json(tournament);
+      res.status(200).json(tournament);
     });
   }
 
@@ -48,7 +48,7 @@ export class TournamentController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted tournament!' });
+      res.status(200).json({ message: 'Successfully deleted tournament!' });
     });
   }
 }

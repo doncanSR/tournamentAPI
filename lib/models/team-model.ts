@@ -10,7 +10,7 @@ export const teamSchema = new Schema({
     name: {
         type: String
     },
-    players: {
+    playersNo: {
         type: Number
     },
     coach: {

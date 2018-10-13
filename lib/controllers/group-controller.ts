@@ -15,7 +15,7 @@ export class GroupController {
       if (err) {
         res.send(err);
       }
-      res.json(group);
+      res.status(200).json(group);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class GroupController {
       if (err) {
 
       }
-      res.json(group);
+      res.status(200).json(group);
     })
   }
 
@@ -37,7 +37,7 @@ export class GroupController {
       if (err) {
         res.send(err);
       }
-      res.json(group);
+      res.status(200).json(group);
     })
   }
 
@@ -46,7 +46,7 @@ export class GroupController {
       if (err) {
         res.send(err);
       }
-      res.json(group);
+      res.status(200).json(group);
     });
   }
 
@@ -55,7 +55,7 @@ export class GroupController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted group!' });
+      res.status(200).json({ message: 'Successfully deleted group!' });
     });
   }
 }

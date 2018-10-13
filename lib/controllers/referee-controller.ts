@@ -15,7 +15,7 @@ export class RefereeController {
       if (err) {
         res.send(err);
       }
-      res.json(referee);
+      res.status(200).json(referee);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class RefereeController {
       if (err) {
 
       }
-      res.json(referee);
+      res.status(200).json(referee);
     })
   }
 
@@ -37,7 +37,7 @@ export class RefereeController {
       if (err) {
         res.send(err);
       }
-      res.json(referee);
+      res.status(200).json(referee);
     })
   }
 
@@ -46,7 +46,7 @@ export class RefereeController {
       if (err) {
         res.send(err);
       }
-      res.json(referee);
+      res.status(200).json(referee);
     });
   }
 
@@ -55,7 +55,7 @@ export class RefereeController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted referee!' });
+      res.status(200).json({ message: 'Successfully deleted referee!' });
     });
   }
 }

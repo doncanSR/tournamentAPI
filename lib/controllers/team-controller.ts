@@ -15,7 +15,7 @@ export class TeamController {
       if (err) {
         res.send(err);
       }
-      res.json(team);
+      res.status(200).json(team);
     })
   }
   /**
@@ -25,19 +25,19 @@ export class TeamController {
       if (err) {
 
       }
-      res.json(teams);
+      res.status(200).json(teams);
     })
   }
 
   /**
    * getTornamentWithId
    */
-  public getTornamentWithId(req: Request, res: Response) {
+  public getTeamWithId(req: Request, res: Response) {
     Team.findById(req.params.teamId, (err, team) => {
       if (err) {
         res.send(err);
       }
-      res.json(team);
+      res.status(200).json(team);
     })
   }
 
@@ -46,7 +46,7 @@ export class TeamController {
       if (err) {
         res.send(err);
       }
-      res.json(team);
+      res.status(200).json(team);
     });
   }
 
@@ -55,7 +55,7 @@ export class TeamController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted Team!' });
+      res.status(200).json({ message: 'Successfully deleted Team!' });
     });
   }
 }

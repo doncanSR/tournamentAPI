@@ -15,7 +15,7 @@ export class CapturistController {
       if (err) {
         res.send(err);
       }
-      res.json(capturist);
+      res.status(200).json(capturist);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class CapturistController {
       if (err) {
 
       }
-      res.json(capturist);
+      res.status(200).json(capturist);
     })
   }
 
@@ -37,7 +37,7 @@ export class CapturistController {
       if (err) {
         res.send(err);
       }
-      res.json(capturist);
+      res.status(200).json(capturist);
     })
   }
 
@@ -46,7 +46,7 @@ export class CapturistController {
       if (err) {
         res.send(err);
       }
-      res.json(capturist);
+      res.status(200).json(capturist);
     });
   }
 
@@ -55,7 +55,7 @@ export class CapturistController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted capturist!' });
+      res.status(200).json({ message: 'Successfully deleted capturist!' });
     });
   }
 }

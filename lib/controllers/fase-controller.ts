@@ -15,7 +15,7 @@ export class FaseController {
       if (err) {
         res.send(err);
       }
-      res.json(fase);
+      res.status(200).json(fase);
     })
   }
   /**
@@ -25,7 +25,7 @@ export class FaseController {
       if (err) {
 
       }
-      res.json(fase);
+      res.status(200).json(fase);
     })
   }
 
@@ -37,7 +37,7 @@ export class FaseController {
       if (err) {
         res.send(err);
       }
-      res.json(fase);
+      res.status(200).json(fase);
     })
   }
 
@@ -46,7 +46,7 @@ export class FaseController {
       if (err) {
         res.send(err);
       }
-      res.json(fase);
+      res.status(200).json(fase);
     });
   }
 
@@ -55,7 +55,7 @@ export class FaseController {
       if (err) {
         res.send(err);
       }
-      res.json({ message: 'Successfully deleted fase!' });
+      res.status(200).json({ message: 'Successfully deleted fase!' });
     });
   }
 }
