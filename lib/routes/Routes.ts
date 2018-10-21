@@ -10,6 +10,7 @@ import { PlayerController } from "../controllers/player-controller";
 import { MatchController } from "../controllers/match-controller";
 import { RefereeController } from "../controllers/referee-controller";
 import { CapturistController } from "../controllers/capturist-controller";
+import { VerifyToken } from "../utils/verifyTokem";
 
 export class Routes {
 
@@ -22,6 +23,7 @@ export class Routes {
   public matchController: MatchController = new MatchController();
   public refereeController: RefereeController = new RefereeController();
   public capturistController: CapturistController = new CapturistController();
+  public verifyToken: VerifyToken = new VerifyToken();
 
   public routes(app): void {
     //Server status
@@ -38,7 +40,7 @@ export class Routes {
       .delete(this.tournamentController.deleteTournament)
     // Teams
     app.route('/teams')
-      .get(this.teamController.getTeam)
+      .get(this.verifyToken.check ,this.teamController.getTeam)
       .post(this.teamController.addNewTeam)
       .delete(this.teamController.deleteTeam)
     //Group

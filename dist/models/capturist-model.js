@@ -12,6 +12,9 @@ exports.capturistSchema = new Schema({
     password: {
         type: String
     },
+    role: {
+        type: String
+    },
     dateStartSession: {
         type: Date
     },

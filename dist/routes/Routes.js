@@ -10,6 +10,7 @@ const player_controller_1 = require("../controllers/player-controller");
 const match_controller_1 = require("../controllers/match-controller");
 const referee_controller_1 = require("../controllers/referee-controller");
 const capturist_controller_1 = require("../controllers/capturist-controller");
+const verifyTokem_1 = require("../utils/verifyTokem");
 class Routes {
     constructor() {
         this.tournamentController = new tournament_controller_1.TournamentController();
@@ -21,6 +22,7 @@ class Routes {
         this.matchController = new match_controller_1.MatchController();
         this.refereeController = new referee_controller_1.RefereeController();
         this.capturistController = new capturist_controller_1.CapturistController();
+        this.verifyToken = new verifyTokem_1.VerifyToken();
     }
     routes(app) {
         //Server status
@@ -37,7 +39,7 @@ class Routes {
             .delete(this.tournamentController.deleteTournament);
         // Teams
         app.route('/teams')
-            .get(this.teamController.getTeam)
+            .get(this.verifyToken.check, this.teamController.getTeam)
             .post(this.teamController.addNewTeam)
             .delete(this.teamController.deleteTeam);
         //Group
@@ -70,6 +72,7 @@ class Routes {
             .get(this.capturistController.getCapturist)
             .post(this.capturistController.addNewCapturist)
             .delete(this.capturistController.deleteCapturist);
+        //login using capturist
         app.route('/login/capturist')
             .post(this.capturistController.getCapturistWithId);
         // Referee

@@ -38,7 +38,7 @@ class CapturistController {
             if (passwordIsValid)
                 return res.status(401).send({ auth: false, token: null });
             // create a token
-            let token = jwt.sign({ id: capturist.id, name: capturist.name }, 'secret');
+            let token = jwt.sign({ name: capturist.name, role: capturist.role }, 'secret');
             res.status(200).send({ auth: true, token: token, name: capturist.name });
         });
     }
