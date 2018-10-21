@@ -71,6 +71,9 @@ export class Routes {
       .get(this.capturistController.getCapturist)
       .post(this.capturistController.addNewCapturist)
       .delete(this.capturistController.deleteCapturist)
+    //login using capturist
+    app.route('/login/capturist')
+      .post(this.capturistController.getCapturistWithId)
     // Referee
     app.route('/referee')
       .get(this.refereeController.getReferee)

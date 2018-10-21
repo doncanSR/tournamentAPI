@@ -1,9 +1,8 @@
-
-import * as mongoose from 'mongoose';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
-export const capturistSchema = new Schema({
+exports.capturistSchema = new Schema({
     id: {
         type: Schema.Types.ObjectId
     },
@@ -13,13 +12,11 @@ export const capturistSchema = new Schema({
     password: {
         type: String
     },
-    role:{
-        type: String
-    },
     dateStartSession: {
         type: Date
     },
     dateEndSession: {
         type: Date
     }
-})
+});
+//# sourceMappingURL=capturist-model.js.map
