@@ -62,7 +62,7 @@ export class Routes {
       .delete(this.catFaseController.deleteCatFase)
     // Player
     app.route('/player')
-      .get(this.verifyToken.check, this.role.levelTwo, this.playerController.getPlayer)
+      .get(this.playerController.getPlayer)
       .post(this.verifyToken.check, this.role.levelTwo, this.playerController.addNewPlayer)
       .delete(this.verifyToken.check, this.role.levelOne, this.playerController.deletePlayer)
     // Match

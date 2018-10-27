@@ -7,11 +7,11 @@ const role_model_1 = require("../models/role-model");
 const role = mongoose.model('role', role_model_1.rolSchema);
 class Roles {
     /**
-     * check
-     */
+     * levelOne */
     levelOne(req, res, next) {
         if (req.name && req.rol) {
-            if (req.rol === "admin") {
+            let level = deleagteRol(req.rol);
+            if (level === 1) {
                 next();
             }
             else {
@@ -23,7 +23,8 @@ class Roles {
      * levelTwo */
     levelTwo(req, res, next) {
         if (req.name && req.rol) {
-            if (req.rol === "manager") {
+            let level = deleagteRol(req.rol);
+            if (level === 2 || level === 1) {
                 next();
             }
             else {
@@ -32,10 +33,12 @@ class Roles {
         }
     }
     /**
-     * levelTwo */
-    levelThree(req, res, next) {
+     * adminLevel
+     */
+    adminLevel(req, res, next) {
         if (req.name && req.rol) {
-            if (req.rol === "capturist") {
+            let level = deleagteRol(req.rol);
+            if (level === 1) {
                 next();
             }
             else {
@@ -44,17 +47,8 @@ class Roles {
         }
     }
     /**
-     * levelTwo */
-    levelFour(req, res, next) {
-        if (req.name && req.rol) {
-            if (req.rol === "general") {
-                next();
-            }
-            else {
-                return res.status(405).send({ auth: false, message: 'This user is not allowed.' });
-            }
-        }
-    }
+     * deleagteRol
+     */
     /**
      * addManager
      */
@@ -88,11 +82,19 @@ class Roles {
                 if (passwordIsValid)
                     return res.status(401).send({ auth: false, token: null });
                 // create a token
-                let token = jwt.sign({ name: role.name, role: role.role }, 'secret');
+                let token = jwt.sign({ name: role.name, role: role.rol }, 'secret');
                 res.status(200).send({ auth: true, token: token, name: role.name });
             });
         }
     }
 }
 exports.Roles = Roles;
+function deleagteRol(rol) {
+    if (rol === 'admin' || rol === 'manager') {
+        return 1;
+    }
+    if (rol === 'capturist') {
+        return 2;
+    }
+}
 //# sourceMappingURL=roles-controller.js.map

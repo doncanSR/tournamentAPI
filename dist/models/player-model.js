@@ -19,7 +19,7 @@ exports.playerSchema = new Schema({
         type: Number
     },
     birthday: {
-        type: Number
+        type: Date
     },
     teamID: {
         type: String

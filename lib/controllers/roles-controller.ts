@@ -11,8 +11,8 @@ export class Roles {
    * levelOne */
   public levelOne(req, res, next) {
     if (req.name && req.rol) {
-      let level: number = this.deleagteRol(req.rol);
-      if (level === 1 ) {
+      let level: number = deleagteRol(req.rol);
+      if (level === 1) {
         next();
       } else {
         return res.status(405).send({ auth: false, message: 'This user is not allowed.' });
@@ -23,7 +23,7 @@ export class Roles {
    * levelTwo */
   public levelTwo(req, res, next) {
     if (req.name && req.rol) {
-      let level : number = this.deleagteRol(req.rol);
+      let level: number = deleagteRol(req.rol);
       if (level === 2 || level === 1) {
         next();
       } else {
@@ -36,8 +36,8 @@ export class Roles {
    */
   public adminLevel(req, res, next) {
     if (req.name && req.rol) {
-      let level: number = this.deleagteRol(req.rol);
-      if (level === 1 ) {
+      let level = deleagteRol(req.rol);
+      if (level === 1) {
         next();
       } else {
         return res.status(405).send({ auth: false, message: 'This user is not allowed.' });
@@ -47,14 +47,7 @@ export class Roles {
   /**
    * deleagteRol
    */
-  public deleagteRol(rol) : number{
-    if(rol === 'admin' || rol=== 'manager'){
-      return 1;
-    }
-    if (rol === 'capturist') {
-      return 2;
-    }
-  }
+
   /**
    * addManager
    */
@@ -86,9 +79,17 @@ export class Roles {
         let passwordIsValid = bcrypt.compareSync(req.body.password, role.password);
         if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
         // create a token
-        let token = jwt.sign({ name: role.name, role: role.role }, 'secret');
+        let token = jwt.sign({ name: role.name, role: role.rol }, 'secret');
         res.status(200).send({ auth: true, token: token, name: role.name });
       })
     }
+  }
+}
+function deleagteRol(rol: string): number {
+  if (rol === 'admin' || rol === 'manager') {
+    return 1;
+  }
+  if (rol === 'capturist') {
+    return 2;
   }
 }
