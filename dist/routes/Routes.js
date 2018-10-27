@@ -11,6 +11,7 @@ const match_controller_1 = require("../controllers/match-controller");
 const referee_controller_1 = require("../controllers/referee-controller");
 const capturist_controller_1 = require("../controllers/capturist-controller");
 const verifyTokem_1 = require("../utils/verifyTokem");
+const roles_controller_1 = require("../controllers/roles-controller");
 class Routes {
     constructor() {
         this.tournamentController = new tournament_controller_1.TournamentController();
@@ -22,6 +23,7 @@ class Routes {
         this.matchController = new match_controller_1.MatchController();
         this.refereeController = new referee_controller_1.RefereeController();
         this.capturistController = new capturist_controller_1.CapturistController();
+        this.role = new roles_controller_1.Roles();
         this.verifyToken = new verifyTokem_1.VerifyToken();
     }
     routes(app) {
@@ -34,14 +36,14 @@ class Routes {
         });
         //Tournament
         app.route('/tournamnet')
-            .get(this.tournamentController.getTournament)
-            .post(this.tournamentController.addNewTournament)
-            .delete(this.tournamentController.deleteTournament);
+            .get(this.verifyToken.check, this.role.levelOne, this.tournamentController.getTournament)
+            .post(this.verifyToken.check, this.role.levelOne, this.tournamentController.addNewTournament)
+            .delete(this.verifyToken.check, this.role.adminLevel, this.tournamentController.deleteTournament);
         // Teams
         app.route('/teams')
-            .get(this.verifyToken.check, this.teamController.getTeam)
-            .post(this.teamController.addNewTeam)
-            .delete(this.teamController.deleteTeam);
+            .get(this.teamController.getTeam)
+            .post(this.verifyToken.check, this.role.levelOne, this.teamController.addNewTeam)
+            .delete(this.verifyToken.check, this.role.levelOne, this.teamController.deleteTeam);
         //Group
         app.route('/gruop')
             .get(this.groupController.getGroup)
@@ -60,26 +62,31 @@ class Routes {
         // Player
         app.route('/player')
             .get(this.playerController.getPlayer)
-            .post(this.playerController.addNewPlayer)
-            .delete(this.playerController.deletePlayer);
+            .post(this.verifyToken.check, this.role.levelTwo, this.playerController.addNewPlayer)
+            .delete(this.verifyToken.check, this.role.levelOne, this.playerController.deletePlayer);
         // Match
         app.route('/match')
             .get(this.matchController.getMatch)
-            .post(this.matchController.addNewMatch)
-            .delete(this.matchController.deleteMatch);
+            .post(this.verifyToken.check, this.role.levelTwo, this.matchController.addNewMatch)
+            .delete(this.verifyToken.check, this.role.levelOne, this.matchController.deleteMatch);
         // Capturist
         app.route('/capturist')
-            .get(this.capturistController.getCapturist)
-            .post(this.capturistController.addNewCapturist)
-            .delete(this.capturistController.deleteCapturist);
+            .get(this.verifyToken.check, this.role.levelOne, this.capturistController.getCapturist)
+            .post(this.verifyToken.check, this.role.levelOne, this.capturistController.addNewCapturist)
+            .delete(this.verifyToken.check, this.role.levelOne, this.capturistController.deleteCapturist);
         //login using capturist
         app.route('/login/capturist')
             .post(this.capturistController.getCapturistWithId);
         // Referee
         app.route('/referee')
-            .get(this.refereeController.getReferee)
-            .post(this.refereeController.addNewReferee)
-            .delete(this.refereeController.deleteReferee);
+            .get(this.verifyToken.check, this.role.levelTwo, this.refereeController.getReferee)
+            .post(this.verifyToken.check, this.role.levelTwo, this.refereeController.addNewReferee)
+            .delete(this.verifyToken.check, this.role.levelOne, this.refereeController.deleteReferee);
+        // Roles 
+        app.route('/role')
+            .post(this.verifyToken.check, this.role.adminLevel, this.role.addManager);
+        app.route('/role/auth')
+            .post(this.role.getRol);
     }
 }
 exports.Routes = Routes;

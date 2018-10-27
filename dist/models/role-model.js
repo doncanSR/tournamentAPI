@@ -2,11 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-exports.playerSchema = new Schema({
+exports.rolSchema = new Schema({
     id: {
         type: Schema.Types.ObjectId
     },
     name: {
+        type: String
+    },
+    password: {
         type: String
     },
     firstName: {
@@ -15,14 +18,8 @@ exports.playerSchema = new Schema({
     secondName: {
         type: String
     },
-    number: {
-        type: Number
-    },
-    birthday: {
-        type: Date
-    },
-    teamID: {
+    rol: {
         type: String
     }
 });
-//# sourceMappingURL=player-model.js.map
+//# sourceMappingURL=role-model.js.map
