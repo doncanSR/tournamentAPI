@@ -12,6 +12,7 @@ import { RefereeController } from "../controllers/referee-controller";
 import { CapturistController } from "../controllers/capturist-controller";
 import { VerifyToken } from "../utils/verifyTokem";
 import { Roles } from "../controllers/roles-controller";
+import {CoachController} from "../controllers/coach-controller";
 
 export class Routes {
 
@@ -26,6 +27,7 @@ export class Routes {
   public capturistController: CapturistController = new CapturistController();
   public role: Roles = new Roles();
   public verifyToken: VerifyToken = new VerifyToken();
+  public coachController: CoachController = new CoachController();
 
   public routes(app): void {
     //Server status
@@ -43,7 +45,7 @@ export class Routes {
     // Teams
     app.route('/teams')
       .get(this.teamController.getTeam)
-      .post(this.verifyToken.check, this.role.levelOne, this.teamController.addNewTeam)
+      .post(this.verifyToken.check, this.teamController.addNewTeam)
       .delete(this.verifyToken.check, this.role.levelOne, this.teamController.deleteTeam)
     //Group
     app.route('/gruop')
@@ -63,8 +65,14 @@ export class Routes {
     // Player
     app.route('/player')
       .get(this.playerController.getPlayer)
-      .post(this.verifyToken.check, this.role.levelTwo, this.playerController.addNewPlayer)
-      .delete(this.verifyToken.check, this.role.levelOne, this.playerController.deletePlayer)
+      .post(this.verifyToken.check, this.role.levelThree , this.playerController.addNewPlayer)
+      .delete(this.verifyToken.check, this.role.levelThree, this.playerController.deletePlayer)
+    // Coach
+    app.route('/coach')
+      .get(this.coachController.getCoach)
+      .post(this.coachController.addNewCoach)
+      .post('/auth',)
+      .delete(this.verifyToken.check, this.role.levelTwo, this.playerController.deletePlayer)
     // Match
     app.route('/match')
       .get(this.matchController.getMatch)
