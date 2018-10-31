@@ -71,8 +71,9 @@ export class Routes {
     app.route('/coach')
       .get(this.coachController.getCoach)
       .post(this.coachController.addNewCoach)
-      .post('/auth',)
       .delete(this.verifyToken.check, this.role.levelTwo, this.playerController.deletePlayer)
+    app.route('/coach/auth')
+    .post(this.coachController.getCoachWithId)
     // Match
     app.route('/match')
       .get(this.matchController.getMatch)
