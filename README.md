@@ -59,5 +59,5 @@ npm run dev
 
 * **Julio Cesar Ramirez Jimenez** - *Initial work* - [Julio Cesar](https://github.com/JulioCesarRamirez)
 
-* **Doncan Sanchez** - *Initial work*
+* **Doncan Alexis Sanchez Rico** - *Initial work* [Doncan](https://github.com/doncanSR)
 
