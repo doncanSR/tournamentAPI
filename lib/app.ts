@@ -2,6 +2,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Routes } from "./routes/Routes";
 import * as mongoose from "mongoose";
+import * as corns from "cors"
 
 class App {
     public app: express.Application;
@@ -15,6 +16,7 @@ class App {
         this.mongoSetup();
     }
     private config(): void {
+        this.app.use(corns())
         //support application/json type post data
         this.app.use(bodyParser.json());
 
