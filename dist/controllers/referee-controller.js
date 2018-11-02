@@ -36,7 +36,7 @@ class RefereeController {
         });
     }
     updateReferee(req, res) {
-        Referee.findOneAndUpdate({ _id: req.params.refereeId }, req.body, { new: true }, (err, referee) => {
+        Referee.findOneAndUpdate({ _id: req.query.refereeId }, req.body, { new: true }, (err, referee) => {
             if (err) {
                 res.send(err);
             }

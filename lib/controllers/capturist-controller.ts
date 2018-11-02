@@ -48,7 +48,7 @@ export class CapturistController {
   }
 
   public updateCapturist(req: Request, res: Response) {
-    Capturist.findOneAndUpdate({ _id: req.params.capturistId }, req.body, { new: true }, (err, capturist) => {
+    Capturist.findOneAndUpdate({ _id: req.query.capturistId }, req.body, { new: true }, (err, capturist) => {
       if (err) {
         res.send(err);
       }

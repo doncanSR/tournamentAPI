@@ -11,9 +11,6 @@ export const groupSchema = new Schema({
         type: String
     },
     teamID: {
-        type: String
-    },
-    coach: {
-        type: String
+        type: [String]
     }
 });

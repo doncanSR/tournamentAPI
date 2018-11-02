@@ -42,7 +42,7 @@ export class FaseController {
   }
 
   public updateFase(req: Request, res: Response) {
-    Fase.findOneAndUpdate({ _id: req.params.faseId }, req.body, { new: true }, (err, fase) => {
+    Fase.findOneAndUpdate({ _id: req.query.faseId }, req.body, { new: true }, (err, fase) => {
       if (err) {
         res.send(err);
       }

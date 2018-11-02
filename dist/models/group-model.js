@@ -10,10 +10,7 @@ exports.groupSchema = new Schema({
         type: String
     },
     teamID: {
-        type: String
-    },
-    coach: {
-        type: String
+        type: [String]
     }
 });
 //# sourceMappingURL=group-model.js.map

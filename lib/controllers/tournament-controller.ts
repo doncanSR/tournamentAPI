@@ -35,7 +35,7 @@ export class TournamentController {
   }
 
   public updateTournament(req: Request, res: Response) {
-    Tournament.findOneAndUpdate({ _id: req.params.tournamentId }, req.body, { new: true }, (err, tournament) => {
+    Tournament.findOneAndUpdate({ _id: req.query.tournamentId }, req.body, { new: true }, (err, tournament) => {
       if (err) {
         res.send(err);
       }
