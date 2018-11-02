@@ -36,7 +36,7 @@ class TeamController {
         });
     }
     updateTeam(req, res) {
-        Team.findOneAndUpdate({ _id: req.params.teamId }, req.body, { new: true }, (err, team) => {
+        Team.findOneAndUpdate({ _id: req.query.teamId }, req.body, { new: true }, (err, team) => {
             if (err) {
                 res.send(err);
             }

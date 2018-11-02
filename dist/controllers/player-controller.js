@@ -36,7 +36,7 @@ class PlayerController {
         });
     }
     updatePlayer(req, res) {
-        Player.findOneAndUpdate({ _id: req.params.playerId }, req.body, { new: true }, (err, player) => {
+        Player.findOneAndUpdate({ _id: req.query.playerId }, req.body, { new: true }, (err, player) => {
             if (err) {
                 res.send(err);
             }

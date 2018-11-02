@@ -32,6 +32,17 @@ class Roles {
             }
         }
     }
+    levelThree(req, res, next) {
+        if (req.name && req.rol) {
+            let level = deleagteRol(req.rol);
+            if (level === 2 || level === 1 || level === 3) {
+                next();
+            }
+            else {
+                return res.status(405).send({ auth: false, message: 'This user is not allowed.' });
+            }
+        }
+    }
     /**
      * adminLevel
      */
@@ -95,6 +106,9 @@ function deleagteRol(rol) {
     }
     if (rol === 'capturist') {
         return 2;
+    }
+    if (rol === 'coach') {
+        return 3;
     }
 }
 //# sourceMappingURL=roles-controller.js.map

@@ -42,7 +42,7 @@ export class PlayerController {
   }
 
   public updatePlayer(req: Request, res: Response) {
-    Player.findOneAndUpdate({ _id: req.params.playerId }, req.body, { new: true }, (err, player) => {
+    Player.findOneAndUpdate({ _id: req.query.playerId }, req.body, { new: true }, (err, player) => {
       if (err) {
         res.send(err);
       }

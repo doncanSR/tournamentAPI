@@ -36,7 +36,7 @@ class CatFaseController {
         });
     }
     updateCatFase(req, res) {
-        CatFase.findOneAndUpdate({ _id: req.params.catFaseId }, req.body, { new: true }, (err, catFase) => {
+        CatFase.findOneAndUpdate({ _id: req.query.catFaseId }, req.body, { new: true }, (err, catFase) => {
             if (err) {
                 res.send(err);
             }

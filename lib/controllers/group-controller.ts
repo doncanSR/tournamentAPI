@@ -42,7 +42,7 @@ export class GroupController {
   }
 
   public updateGroup(req: Request, res: Response) {
-    Group.findOneAndUpdate({ _id: req.params.groupId }, req.body, { new: true }, (err, group) => {
+    Group.findOneAndUpdate({ _id: req.query.groupId }, req.body, { new: true }, (err, group) => {
       if (err) {
         res.send(err);
       }

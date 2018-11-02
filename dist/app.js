@@ -8,6 +8,7 @@ class App {
     constructor() {
         this.routerPrv = new Routes_1.Routes();
         this.mongoUrl = 'mongodb://localhost/tournamentDB';
+        this.julioLocal = 'mongodb://192.168.100.10:27017/tournamentDB';
         this.app = express();
         this.config();
         this.routerPrv.routes(this.app);
@@ -21,7 +22,7 @@ class App {
     }
     mongoSetup() {
         mongoose.Promise = global.Promise;
-        mongoose.connect(this.mongoUrl);
+        mongoose.connect(this.julioLocal);
     }
 }
 exports.default = new App().app;

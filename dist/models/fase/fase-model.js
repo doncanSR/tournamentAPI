@@ -7,7 +7,7 @@ exports.faseSchema = new Schema({
         type: Schema.Types.ObjectId
     },
     teamID: {
-        type: String
+        type: [String]
     }
 });
 //# sourceMappingURL=fase-model.js.map
