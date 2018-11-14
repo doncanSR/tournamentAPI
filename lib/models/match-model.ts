@@ -13,9 +13,6 @@ export const matchSchema = new Schema({
     teamTwo: {
         type: String
     },
-    refereeName: {
-        type: String
-    },
     faseID: {
         type: String
     },

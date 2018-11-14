@@ -36,7 +36,7 @@ class MatchController {
         });
     }
     updateMatch(req, res) {
-        Match.findOneAndUpdate({ _id: req.params.matchId }, req.body, { new: true }, (err, match) => {
+        Match.findOneAndUpdate({ _id: req.query.matchId }, req.body, { new: true }, (err, match) => {
             if (err) {
                 res.send(err);
             }

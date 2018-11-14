@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const Routes_1 = require("./routes/Routes");
 const mongoose = require("mongoose");
+const corns = require("cors");
 class App {
     constructor() {
         this.routerPrv = new Routes_1.Routes();
@@ -15,6 +16,7 @@ class App {
         this.mongoSetup();
     }
     config() {
+        this.app.use(corns());
         //support application/json type post data
         this.app.use(bodyParser.json());
         //support application/x-form-urlencoded post data
