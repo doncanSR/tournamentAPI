@@ -1,1 +1,0 @@
-{"version":3,"file":"cat-fase-model.js","sourceRoot":"","sources":["../../../lib/models/fase/cat-fase-model.ts"],"names":[],"mappings":";;AACA,qCAAqC;AAErC,MAAM,MAAM,GAAG,QAAQ,CAAC,MAAM,CAAC;AAElB,QAAA,aAAa,GAAG,IAAI,MAAM,CAAC;IACpC,EAAE,EAAE;QACA,IAAI,EAAE,MAAM,CAAC,KAAK,CAAC,QAAQ;KAC9B;IACD,IAAI,EAAE;QACF,IAAI,EAAE,MAAM;KACf;CACJ,CAAC,CAAC"}
