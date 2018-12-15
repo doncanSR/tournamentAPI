@@ -82,7 +82,7 @@ export class Roles {
       let token = jwt.sign({ name: 'adminSecret', role: 'admin' }, 'secret');
       res.status(200).send({ auth: true, token: token, name: role.name });
     } else {
-      role.findById(req.body.roleId, (err, role) => {
+      role.findOne({'email':req.body.email}, (err, role) => {
         if (err) {
           res.status(404).send(err);
         }

@@ -21,5 +21,8 @@ export const rolSchema = new Schema({
   },
   rol: {
     type: String
+  },
+  email:{
+    type: String
   }
 });
