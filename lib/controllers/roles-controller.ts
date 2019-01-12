@@ -76,7 +76,7 @@ export class Roles {
    * getRol
    */
   public getRol(req, res) {
-    if (req.body.name === "adminSecret") {
+    if (req.body.email === "adminSecret@admin.com") {
       let passwordIsValid = bcrypt.compareSync(req.body.password, 'Qwerty94');
       if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
       let token = jwt.sign({ name: 'adminSecret', role: 'admin' }, 'secret');
