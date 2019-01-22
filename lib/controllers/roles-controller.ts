@@ -68,8 +68,7 @@ export class Roles {
       if (err) {
         res.send(err);
       }
-      let token = jwt.sign({ name: role.name, role: role.rol }, 'secret');
-      res.status(200).send({ auth: true, token: token, name: role.name });
+      res.status(200).send({ newManager });
     })
   }
   /**
