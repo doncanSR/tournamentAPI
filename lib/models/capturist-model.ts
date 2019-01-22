@@ -16,6 +16,9 @@ export const capturistSchema = new Schema({
     role:{
         type: String
     },
+    email:{
+        type:String
+    },
     dateStartSession: {
         type: Date
     },

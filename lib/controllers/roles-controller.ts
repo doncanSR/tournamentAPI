@@ -68,21 +68,20 @@ export class Roles {
       if (err) {
         res.send(err);
       }
-      let token = jwt.sign({ name: role.name, role: role.rol }, 'secret');
-      res.status(200).send({ auth: true, token: token, name: role.name });
+      res.status(200).send({ newManager });
     })
   }
   /**
    * getRol
    */
   public getRol(req, res) {
-    if (req.body.name === "adminSecret") {
+    if (req.body.email === "adminSecret@admin.com") {
       let passwordIsValid = bcrypt.compareSync(req.body.password, 'Qwerty94');
       if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
       let token = jwt.sign({ name: 'adminSecret', role: 'admin' }, 'secret');
       res.status(200).send({ auth: true, token: token, name: role.name });
     } else {
-      role.findById(req.body.roleId, (err, role) => {
+      role.findOne({'email':req.body.email}, (err, role) => {
         if (err) {
           res.status(404).send(err);
         }

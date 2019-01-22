@@ -35,16 +35,20 @@ export class CapturistController {
    * getCapturistWithId
    */
   public getCapturistWithId(req: Request, res: Response) {
-    Capturist.findById(req.body.capturistId, (err, capturist) => {
+    const date = new Date();
+    let cap = {
+      dateStartSession: date
+    }
+    Capturist.findOneAndUpdate({ 'email': req.body.email }, cap, { new: true }, (err, capturist) => {
       if (err) {
         res.status(404).send(err);
       }
       let passwordIsValid = bcrypt.compareSync(req.body.password, capturist.password);
       if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
       // create a token
-      let token = jwt.sign({name: capturist.name, role: capturist.role}, 'secret');
+      let token = jwt.sign({ name: capturist.name, role: capturist.role }, 'secret');
       res.status(200).send({ auth: true, token: token, name: capturist.name });
-    })
+    });
   }
 
   public updateCapturist(req: Request, res: Response) {
