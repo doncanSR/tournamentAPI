@@ -9,10 +9,8 @@ import { FaseController } from "../controllers/fase-controller";
 import { PlayerController } from "../controllers/player-controller";
 import { MatchController } from "../controllers/match-controller";
 import { RefereeController } from "../controllers/referee-controller";
-import { CapturistController } from "../controllers/capturist-controller";
 import { VerifyToken } from "../utils/verifyTokem";
 import { Roles } from "../controllers/roles-controller";
-import {CoachController} from "../controllers/coach-controller";
 
 export class Routes {
 
@@ -24,10 +22,8 @@ export class Routes {
   public playerController: PlayerController = new PlayerController();
   public matchController: MatchController = new MatchController();
   public refereeController: RefereeController = new RefereeController();
-  public capturistController: CapturistController = new CapturistController();
   public role: Roles = new Roles();
   public verifyToken: VerifyToken = new VerifyToken();
-  public coachController: CoachController = new CoachController();
 
   public routes(app): void {
     //Server status
@@ -71,32 +67,25 @@ export class Routes {
     // Player
     app.route('/player')
       .get(this.playerController.getPlayer)
-      .post(this.verifyToken.check, this.role.levelThree , this.playerController.addNewPlayer)
+      .post(this.verifyToken.check, this.role.levelThree, this.playerController.addNewPlayer)
       .put(this.playerController.updatePlayer)
       .delete(this.verifyToken.check, this.role.levelThree, this.playerController.deletePlayer)
     // Coach
     app.route('/coach')
-      .get(this.coachController.getCoach)
-      .post(this.coachController.addNewCoach)
-      .delete(this.verifyToken.check, this.role.levelTwo, this.playerController.deletePlayer)
-
-    app.route('/coach/auth')
-      .post(this.coachController.getCoachWithId)
+      .get(this.verifyToken.check, this.role.levelTwo, this.role.getCoaches)
+      .post(this.role.createCoach)
+    //Manager
+    app.route('/manager')
+      .get(this.verifyToken.check, this.role.adminLevel, this.role.getManagers)
+    // Capturist
+    app.route('/capturist')
+      .get(this.verifyToken.check, this.role.levelOne, this.role.getCapturist)
     // Match
     app.route('/match')
       .get(this.matchController.getMatch)
       .post(this.verifyToken.check, this.role.levelTwo, this.matchController.addNewMatch)
       .delete(this.verifyToken.check, this.role.levelOne, this.matchController.deleteMatch)
       .put(this.matchController.updateMatch)
-    // Capturist
-    app.route('/capturist')
-      .get(this.verifyToken.check, this.role.levelOne, this.capturistController.getCapturist)
-      .post(this.verifyToken.check, this.role.levelOne, this.capturistController.addNewCapturist)
-      .delete(this.verifyToken.check, this.role.levelOne, this.capturistController.deleteCapturist)
-      .put(this.capturistController.updateCapturist)
-    //login using capturist
-    app.route('/login/capturist')
-      .post(this.capturistController.getCapturistWithId)
     // Referee
     app.route('/referee')
       .get(this.verifyToken.check, this.role.levelTwo, this.refereeController.getReferee)
@@ -105,8 +94,12 @@ export class Routes {
       .put(this.refereeController.updateReferee)
     // Roles 
     app.route('/role')
-      .post(this.verifyToken.check, this.role.adminLevel, this.role.addManager)
+      .post(this.verifyToken.check, this.role.levelOne, this.role.addUser)
+      .delete(this.verifyToken.check, this.role.levelOne, this.role.deleteUser)
+      .put(this.refereeController.updateReferee, this.role.levelOne, this.role.updateUser)
     app.route('/role/auth')
-      .post(this.role.getRol)
+      .post(this.role.logIn)
+    app.route('/role/auth/logout')
+      .post(this.role.logOut)
   }
 }
