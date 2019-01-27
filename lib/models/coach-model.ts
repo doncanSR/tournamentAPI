@@ -13,19 +13,22 @@ export const coachSchema = new Schema({
     password: {
         type: String,
     },
-    role:{
+    role: {
         type: String
     },
-    firstName:{
-      type: String
+    firstName: {
+        type: String
     },
-    secondName:{
-      type: String
+    secondName: {
+        type: String
     },
-    association:{
-      type: String
+    association: {
+        type: String
     },
-    teamId:{
-      type: String
+    email: {
+        type: String
+    },
+    teamId: {
+        type: String
     }
 })

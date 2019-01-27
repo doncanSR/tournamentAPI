@@ -18,8 +18,8 @@ export class CoachController {
         res.status(404).send(err);
       }
       // create a token
-      let token = jwt.sign({name: coach.name, role: coach.role}, 'secret');
-      res.status(200).send({ auth: true, token: token, name: coach.name });
+      let token = jwt.sign({ name: coach.name, role: coach.role }, 'secret');
+      res.status(200).send({ auth: true, token: token, name: coach.id });
     })
   }
   /**
@@ -37,14 +37,15 @@ export class CoachController {
    * getcoachWithId
    */
   public getCoachWithId(req: Request, res: Response) {
-    coach.findById(req.params.coachId, (err, coach) => {
+
+    coach.findOne({ 'email': req.body.email }, (err, coach) => {
       if (err) {
         res.status(404).send(err);
       }
       let passwordIsValid = bcrypt.compareSync(req.body.password, coach.password);
       if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
       // create a token
-      let token = jwt.sign({name: coach.name, role: coach.role}, 'secret');
+      let token = jwt.sign({ name: coach.name, role: coach.role }, 'secret');
       res.status(200).send({ auth: true, token: token, name: coach.name });
     })
   }
