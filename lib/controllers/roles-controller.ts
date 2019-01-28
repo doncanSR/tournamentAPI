@@ -94,13 +94,29 @@ export class Roles {
     }
     role.findOneAndUpdate({ 'email': req.body.email }, user, { new: true }, (err, user) => {
       if (err) {
-        res.send(err);
+        res.status(404).send({ error: 'user not found' });
       }
       let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
       if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
       // create a token
-      let token = jwt.sign({ name: user.name, role: user.rol }, 'secret');
-      res.status(200).send({ auth: true, token: token, name: user._id });
+      let token = jwt.sign({ name: user._id, role: user.rol }, 'secret');
+      switch (user.rol) {
+        case 'admin':
+          res.status(200).send({ auth: true, token: token });
+          break;
+        case 'capturist':
+          res.status(200).send({ auth: true, token: token, tournament: user.tournamentId });
+          break;
+        case 'manager':
+          res.status(200).send({ auth: true, token: token, tournament: user.tournamentId });
+          break;
+        case 'coach':
+          res.status(200).send({ auth: true, token: token, name: user._id, tournament: user.tournamentId });
+          break;
+        default:
+          res.status(404).send({ error: 'user not found' });
+          break;
+      }
     });
   }
 
@@ -136,11 +152,11 @@ export class Roles {
     let cap = {
       dateEndSession: date
     }
-    role.findOneAndUpdate({ 'email': req.body.email }, cap, { new: true }, (err, user) => {
+    role.findOneAndUpdate({ _id: req.name }, cap, { new: true }, (err, user) => {
       if (err) {
         res.send(err);
       }
-      res.status(200).json(user);
+      res.status(200).json('Logout success!');
     });
   }
 
@@ -148,32 +164,32 @@ export class Roles {
    * getCoaches
    */
   public getCoaches(req, res) {
-    role.find({'rol': 'coach'}, (err, coches) => {
+    role.find({ 'rol': 'coach' }, (err, coches) => {
       if (err) {
-        res.status(404).json({error: 'no coaches found'})
+        res.status(404).json({ error: 'no coaches found' })
       }
       res.status(200).json(coches);
     })
   }
-    /**
-   * getManagers
-   */
+  /**
+ * getManagers
+ */
   public getManagers(req, res) {
-    role.find({'rol': 'manager'}, (err, managers) => {
+    role.find({ 'rol': 'manager' }, (err, managers) => {
       if (err) {
-        res.status(404).json({error: 'no managers found'})
+        res.status(404).json({ error: 'no managers found' })
       }
       res.status(200).json(managers);
     })
   }
 
-    /**
-   * getCapturist
-   */
+  /**
+ * getCapturist
+ */
   public getCapturist(req, res) {
-    role.find({'rol': 'capturist'}, (err, capturists) => {
+    role.find({ 'rol': 'capturist' }, (err, capturists) => {
       if (err) {
-        res.status(404).json({error: 'no capturist found'})
+        res.status(404).json({ error: 'no capturist found' })
       }
       res.status(200).json(capturists);
     })

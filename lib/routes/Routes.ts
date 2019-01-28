@@ -100,6 +100,6 @@ export class Routes {
     app.route('/role/auth')
       .post(this.role.logIn)
     app.route('/role/auth/logout')
-      .post(this.role.logOut)
+      .post(this.verifyToken.check,this.role.logOut)
   }
 }
