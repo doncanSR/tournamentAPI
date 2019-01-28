@@ -22,7 +22,16 @@ export const rolSchema = new Schema({
   rol: {
     type: String
   },
-  email:{
+  email: {
+    type: String
+  },
+  dateStarSession: {
+    type: Date
+  },
+  dateEndSession: {
+    type: Date
+  },
+  tournamentId: {
     type: String
   }
 });

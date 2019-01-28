@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import * as mongoose from 'mongoose';
 import { rolSchema } from "../models/role-model";
 
+
 const role = mongoose.model('role', rolSchema);
 
 export class Roles {
@@ -55,45 +56,149 @@ export class Roles {
     }
   }
   /**
-   * deleagteRol
+   * addUser
    */
-
-  /**
-   * addManager
-   */
-  public addManager(req, res) {
-    let newManager = new role(req.body);
-
-    newManager.save((err, role) => {
+  public addUser(req, res) {
+    let newUser = new role(req.body);
+    newUser.save((err, role) => {
       if (err) {
         res.send(err);
       }
-      res.status(200).send({ newManager });
+      // create a token
+      res.status(200).send({ newUser });
+    })
+  }
+
+  /**
+   * createCoach
+   */
+  public createCoach(req, res) {
+    let newCoach = new role(req.body);
+    newCoach.save((err, coach) => {
+      if (err) {
+        res.status(404).send(err);
+      }
+      // create a token
+      let token = jwt.sign({ name: coach.name, role: coach.role }, 'secret');
+      res.status(200).send({ auth: true, token: token, name: coach.id });
+    })
+  }
+
+  /**
+   * logIn
+   */
+  public logIn(req, res) {
+    const date = new Date();
+    let user = {
+      dateStarSession: date
+    }
+    role.findOneAndUpdate({ 'email': req.body.email }, user, { new: true }, (err, user) => {
+      if (err) {
+        res.status(404).send({ error: 'user not found' });
+      }
+      let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+      if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
+      // create a token
+      let token = jwt.sign({ name: user._id, role: user.rol }, 'secret');
+      switch (user.rol) {
+        case 'admin':
+          res.status(200).send({ auth: true, token: token });
+          break;
+        case 'capturist':
+          res.status(200).send({ auth: true, token: token, tournament: user.tournamentId });
+          break;
+        case 'manager':
+          res.status(200).send({ auth: true, token: token, tournament: user.tournamentId });
+          break;
+        case 'coach':
+          res.status(200).send({ auth: true, token: token, name: user._id, tournament: user.tournamentId });
+          break;
+        default:
+          res.status(404).send({ error: 'user not found' });
+          break;
+      }
+    });
+  }
+
+  /**
+   * updateUser
+   */
+  public updateUser(req, res) {
+    role.findOneAndUpdate({ 'email': req.body.email }, req.body, { new: true }, (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.status(200).json(user);
+    });
+  }
+
+  /**
+   * deleteUser
+   */
+  public deleteUser(req, res) {
+    role.remove({ 'email': req.body.email }, (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.status(200).json({ message: 'Successfully deleted coach!' });
+    });
+  }
+
+  /**
+   * logOut
+   */
+  public logOut(req, res) {
+    const date = new Date();
+    let cap = {
+      dateEndSession: date
+    }
+    role.findOneAndUpdate({ _id: req.name }, cap, { new: true }, (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.status(200).json('Logout success!');
+    });
+  }
+
+  /**
+   * getCoaches
+   */
+  public getCoaches(req, res) {
+    role.find({ 'rol': 'coach' }, (err, coches) => {
+      if (err) {
+        res.status(404).json({ error: 'no coaches found' })
+      }
+      res.status(200).json(coches);
     })
   }
   /**
-   * getRol
-   */
-  public getRol(req, res) {
-    if (req.body.email === "adminSecret@admin.com") {
-      let passwordIsValid = bcrypt.compareSync(req.body.password, 'Qwerty94');
-      if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
-      let token = jwt.sign({ name: 'adminSecret', role: 'admin' }, 'secret');
-      res.status(200).send({ auth: true, token: token, name: role.name });
-    } else {
-      role.findOne({'email':req.body.email}, (err, role) => {
-        if (err) {
-          res.status(404).send(err);
-        }
-        let passwordIsValid = bcrypt.compareSync(req.body.password, role.password);
-        if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
-        // create a token
-        let token = jwt.sign({ name: role.name, role: role.rol }, 'secret');
-        res.status(200).send({ auth: true, token: token, name: role.name });
-      })
-    }
+ * getManagers
+ */
+  public getManagers(req, res) {
+    role.find({ 'rol': 'manager' }, (err, managers) => {
+      if (err) {
+        res.status(404).json({ error: 'no managers found' })
+      }
+      res.status(200).json(managers);
+    })
   }
+
+  /**
+ * getCapturist
+ */
+  public getCapturist(req, res) {
+    role.find({ 'rol': 'capturist' }, (err, capturists) => {
+      if (err) {
+        res.status(404).json({ error: 'no capturist found' })
+      }
+      res.status(200).json(capturists);
+    })
+  }
+
 }
+/**
+  * deleagteRol
+  */
 function deleagteRol(rol: string): number {
   if (rol === 'admin' || rol === 'manager') {
     return 1;
