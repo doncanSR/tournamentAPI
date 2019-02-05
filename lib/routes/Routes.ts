@@ -35,7 +35,7 @@ export class Routes {
       })
     //Tournament
     app.route('/tournament')
-      .get(this.verifyToken.check, this.role.levelOne, this.tournamentController.getTournament)
+      .get(this.tournamentController.getTournament)
       .post(this.verifyToken.check, this.role.levelOne, this.tournamentController.addNewTournament)
       .delete(this.verifyToken.check, this.role.adminLevel, this.tournamentController.deleteTournament)
       .put(this.tournamentController.updateTournament)
