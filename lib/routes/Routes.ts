@@ -70,6 +70,8 @@ export class Routes {
       .post(this.verifyToken.check, this.role.levelThree, this.playerController.addNewPlayer)
       .put(this.playerController.updatePlayer)
       .delete(this.verifyToken.check, this.role.levelThree, this.playerController.deletePlayer)
+    app.route('/player/team')
+      .get(this.playerController.getByTeamID)
     // Coach
     app.route('/coach')
       .get(this.verifyToken.check, this.role.levelTwo, this.role.getCoaches)
@@ -100,6 +102,6 @@ export class Routes {
     app.route('/role/auth')
       .post(this.role.logIn)
     app.route('/role/auth/logout')
-      .post(this.verifyToken.check,this.role.logOut)
+      .post(this.verifyToken.check, this.role.logOut)
   }
 }
