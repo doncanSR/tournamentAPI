@@ -47,7 +47,7 @@ export class Routes {
       .delete(this.verifyToken.check, this.role.levelOne, this.teamController.deleteTeam)
       .put(this.teamController.updateTeam)
     //Group
-    app.route('/gruop')
+    app.route('/group')
       .get(this.groupController.getGroup)
       .post(this.groupController.addNewGroup)
       .put(this.groupController.updateGroup)
