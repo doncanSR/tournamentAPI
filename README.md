@@ -10,13 +10,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 You need to have previusly installed Nodejs with this version v8.9.4, https://nodejs.org/es/download/
 
-Download mongodb this version is the recomended to use 3.4.9 here is https://docs.mongodb.com/manual/installation/ the documentatio
+Download mongodb this version is the recomended to use 3.4.9 here is https://docs.mongodb.com/manual/installation/ the 
+
+Documentatio
 to set up mongo, also is recomended to dowload https://nosqlbooster.com/downloads mongobooster, to manage the db with an IDE
+
+Typescript version 3.1.1
+
+ts-node version 7.0.1
 
 Also you need to install Typescript globally in your PC, usin the following command:
 
 ```
 npm install -g typescript
+npm install -g ts-node
 ```
 
 
@@ -46,6 +53,7 @@ mongod
 once you start mongo server, you should run the api, in the API folder with the following command:
 
 ```
+npm run build
 npm run dev
 ```
 
@@ -60,4 +68,6 @@ npm run dev
 * **Julio Cesar Ramirez Jimenez** - *Initial work* - [Julio Cesar](https://github.com/JulioCesarRamirez)
 
 * **Doncan Alexis Sanchez Rico** - *Initial work* [Doncan](https://github.com/doncanSR)
+
+* **Jonathan Ramirez Jimenez** - *Initial work* [Jony](https://github.com/JonathanRamirezJ)
 
