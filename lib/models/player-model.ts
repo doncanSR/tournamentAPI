@@ -24,5 +24,8 @@ export const playerSchema = new Schema({
     },
     teamID:{
         type: String
+    },
+    tournamentID: {
+        type: String
     }
 });
