@@ -94,10 +94,10 @@ export class Roles {
     }
     role.findOneAndUpdate({ 'email': req.body.email }, user, { new: true }, (err, user) => {
       if (err) {
-        res.status(404).send({ error: 'user not found' });
+        res.status(404).send({ error: {code: '404', message:'user not found'}});
       }
-      let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-      if (passwordIsValid) return res.status(401).send({ auth: false, token: null });
+      let passwordIsValid = (req.body.password === user.password) ? true : false;
+      if (!passwordIsValid) return res.status(401).send({ error: {code: '403', message:'Invalid password'}});
       // create a token
       let token = jwt.sign({ name: user._id, role: user.rol }, 'secret');
       switch (user.rol) {
@@ -114,7 +114,7 @@ export class Roles {
           res.status(200).send({ auth: true, token: token, name: user._id, tournament: user.tournamentId });
           break;
         default:
-          res.status(404).send({ error: 'user not found' });
+          res.status(404).send({ error: {code: '404', message:'user not found'}});
           break;
       }
     });
@@ -126,7 +126,7 @@ export class Roles {
   public updateUser(req, res) {
     role.findOneAndUpdate({ 'email': req.body.email }, req.body, { new: true }, (err, user) => {
       if (err) {
-        res.send(err);
+        res.status(404).send({ error: {code: '404', message:'user not found'}});
       }
       res.status(200).json(user);
     });
@@ -138,7 +138,7 @@ export class Roles {
   public deleteUser(req, res) {
     role.remove({ 'email': req.body.email }, (err, user) => {
       if (err) {
-        res.send(err);
+        res.status(404).send({ error: {code: '404', message:'user not found'}});
       }
       res.status(200).json({ message: 'Successfully deleted coach!' });
     });
@@ -154,7 +154,7 @@ export class Roles {
     }
     role.findOneAndUpdate({ _id: req.name }, cap, { new: true }, (err, user) => {
       if (err) {
-        res.send(err);
+        res.status(404).send({ error: {code: '404', message:'user not found'}});
       }
       res.status(200).json('Logout success!');
     });
@@ -166,7 +166,7 @@ export class Roles {
   public getCoaches(req, res) {
     role.find({ 'rol': 'coach' }, (err, coches) => {
       if (err) {
-        res.status(404).json({ error: 'no coaches found' })
+        res.status(404).send({ error: {code: '404', message:'coaches not found'}});
       }
       res.status(200).json(coches);
     })
@@ -177,7 +177,7 @@ export class Roles {
   public getManagers(req, res) {
     role.find({ 'rol': 'manager' }, (err, managers) => {
       if (err) {
-        res.status(404).json({ error: 'no managers found' })
+        res.status(404).send({ error: {code: '404', message:'manager not found'}});
       }
       res.status(200).json(managers);
     })
@@ -189,7 +189,7 @@ export class Roles {
   public getCapturist(req, res) {
     role.find({ 'rol': 'capturist' }, (err, capturists) => {
       if (err) {
-        res.status(404).json({ error: 'no capturist found' })
+        res.status(404).send({ error: {code: '404', message:'capturist not found'}});
       }
       res.status(200).json(capturists);
     })
