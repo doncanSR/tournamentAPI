@@ -15,5 +15,9 @@ export const refereeSchema = new Schema({
     },
     association: {
         type: String
+    },
+    tournamentID: {
+        type: String,
+        required: [true, 'TournamentId is needed']
     }
 })

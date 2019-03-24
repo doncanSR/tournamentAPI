@@ -36,5 +36,9 @@ export const matchSchema = new Schema({
     }, 
     refereeId: {
         type: String
+    },
+    tournamentID: {
+        type: String,
+        required: [true, 'TournamentId is needed']
     }
 });

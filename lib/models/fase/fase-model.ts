@@ -12,5 +12,9 @@ export const faseSchema = new Schema({
     },
     catFaseId:{
         type: String
+    }, 
+    tournamentID: {
+        type: String,
+        required: [true, 'TournamentId is needed']
     }
 });
