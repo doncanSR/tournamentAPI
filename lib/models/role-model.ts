@@ -32,6 +32,7 @@ export const rolSchema = new Schema({
     type: Date
   },
   tournamentId: {
-    type: String
+    type: String,
+    required: [true, 'TournamentId is needed']
   }
 });
