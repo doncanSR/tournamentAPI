@@ -9,9 +9,11 @@ export class createSchedule implements ScheduleInterface {
   correctTeams: number;
   totalClasifications:number;
   teamsPerGruopExc:number;
+  tournamentId:string;
 
-  constructor(teams: number) {
+  constructor(teams: number, tournamentId:string) {
     this.teams = teams;
+    this.tournamentId = tournamentId;
   }
   /**
    * buildSchedule
