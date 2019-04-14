@@ -13,7 +13,7 @@ export const teamSchema = new Schema({
     playersNo: {
         type: Number
     },
-    coach: {
+    coachId: {
         type: String
     },
     from: {
@@ -25,4 +25,5 @@ export const teamSchema = new Schema({
     tournamentID: {
         type: String
     }
+    //Arrego de torneos
 })
