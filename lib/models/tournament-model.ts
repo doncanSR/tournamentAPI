@@ -11,10 +11,10 @@ export const tournmanetSchema = new Schema({
         type: String,
         required: 'Enter a last name'
     },
-    starDate: {
+    startDate: {
         type: Date
     },
-    EndDate: {
+    endDate: {
         type: Date
     },
     state: {
