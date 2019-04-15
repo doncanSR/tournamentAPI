@@ -34,10 +34,8 @@ export class Schedulefill {
   public async fill() {
     await this.getTeams();
     if (this.totalClasifications) {
-      // this.createClassifications();
-      // this.createGroups();
-      // this.fillClassifications();
-      // this.fillGroups();
+      this.createClassifications();
+      this.createGroups();
     } else {
       this.createGroups();
     }
@@ -68,17 +66,31 @@ export class Schedulefill {
 
   private async createGroups(): Promise<void> {
     let object = { nameGroup: 0, tournamentID: this.tournamentId, teamID: [] };
+
     for (let index = 0; index < this.groups; index++) {
       await this.fillTeamPerGroup(this.teamsPerGroup);
       if (this.teamsID) {
         object.teamID = this.teamsID;
-        object.nameGroup = index + 1;
+        object.nameGroup = (index + 1);
         await this.saveGroup(object);
+        this.groups - 1;
         this.teamsID = [];
       } else {
         break;
       };
-
+    }
+    if (this.excededGroups && this.groups === 0) {
+      for (let index = 0; index < this.groups; index++) {
+        await this.fillTeamPerGroup(this.teamsPerGruopExc);
+        if (this.teamsID) {
+          object.teamID = this.teamsID;
+          object.nameGroup = await Team.find({ 'tournamentID': this.tournamentId }, 'nameGroup').sort({ date: -1 }).limit(1);
+          await this.saveGroup(object);
+          this.teamsID = [];
+        } else {
+          break;
+        };
+      }
     }
     Group.find({}, (err, groups) => {
       if (err) {
@@ -105,10 +117,6 @@ export class Schedulefill {
       this.teamsID = null;
       console.log('All the teams were used');
     }
-  }
-
-  private fillClassifications(): void {
-
   }
 
 }
