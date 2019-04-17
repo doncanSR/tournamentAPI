@@ -8,7 +8,6 @@ class App {
     public app: express.Application;
     public routerPrv: Routes = new Routes();
     public mongoUrl: string = 'mongodb://localhost/tournamentDB';
-    public julioLocal: string = 'mongodb://192.168.100.10:27017/tournamentDB';
 
     constructor() {
         this.app = express();
@@ -27,11 +26,7 @@ class App {
     }
     private mongoSetup(): void {
         mongoose.Promise = global.Promise;
-        // mongoose.connect(this.julioLocal);
-        mongoose.connect(this.mongoUrl, function(err) {
-            if (err) throw err;
-            else console.log('Connected with MongoDB');
-        });
+        mongoose.connect(this.mongoUrl);
     }
 }
 

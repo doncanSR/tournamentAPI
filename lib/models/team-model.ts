@@ -23,7 +23,8 @@ export const teamSchema = new Schema({
         type: Number
     },
     tournamentID: {
-        type: String
+        type: String,
+        required: [true, 'TournamentId is needed']
     }
     //Arrego de torneos
 })

@@ -35,6 +35,7 @@ export const matchSchema = new Schema({
         type: String
     },
     tournamentID: {
-        type: String
+        type: String,
+        required: [true, 'TournamentId is needed']
     }
 });

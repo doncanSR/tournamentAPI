@@ -49,7 +49,7 @@ export class Routes {
     //Group
     app.route('/group')
       .get(this.groupController.getGroup)
-      .post(this.groupController.addNewGroup)
+      .post(this.verifyToken.check, this.role.levelOne, this.groupController.addNewGroup)
       .put(this.groupController.updateGroup)
       .delete(this.groupController.deleteGroup)
     //Fase 

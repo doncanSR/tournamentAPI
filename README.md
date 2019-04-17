@@ -1,6 +1,6 @@
-# Tournament API 
+# Tournament API
 
-This is the API for the Tournament APP, created in node using typescript. 
+This is the API for the Tournament APP, created in node using typescript.
 
 ## Getting Started
 
@@ -8,7 +8,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You need to have previusly installed Nodejs with this version v8.9.4, https://nodejs.org/es/download/
+You need to have previusly installed Nodejs with this version v8.9.4, https://nodejs.org/es/download/ ,
+
+Must have preferably Yarn v.1.13.0 as fast dependency management. [yarnpkg](https://yarnpkg.com/es-ES/),
 
 Download mongodb this version is the recomended to use 3.4.9 here is https://docs.mongodb.com/manual/installation/ the 
 
@@ -32,7 +34,7 @@ npm install -g ts-node
 To run the API you just need to install al the dependencies using
 
 ```
-npm install
+Yarn
 ```
 
 ### Start API
@@ -53,15 +55,20 @@ mongod
 once you start mongo server, you should run the api, in the API folder with the following command:
 
 ```
+<<<<<<< HEAD
 npm run build
 npm run dev
+=======
+yarn dev
+>>>>>>> cc67b467919df1dc3a673f37cca26473299685ee
 ```
 
 ## Code version syntax
 
-* feat(moduleName): resume changes || this will be used to add new features to the app. 
+* feat(moduleName): resume changes || this will be used to add new features to the app.
 * fix(moduleName): resume changes  || this will be used to fix something to the app.
 * refactor(moduleName): resume changes  || this will be used to refactor some module.
+* tool: For build process changes (ie. package.json).
 
 ## Authors
 
