@@ -73,7 +73,9 @@ export class Schedulefill {
         object.teamID = this.teamsID;
         object.nameGroup = (index + 1);
         await this.saveGroup(object);
-        this.groups - 1;
+        if (index === (this.groups - 1)) {
+          this.groups = 0;
+        }
         this.teamsID = [];
       } else {
         break;
