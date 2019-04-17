@@ -13,10 +13,12 @@ export class PlayerController {
   public addNewPlayer(req: Request, res: Response) {
     let newPlayer = new Player(req.body);
     let newTeam;
+    console.log('req.body -->',req.body);
     newPlayer.save((err, player) => {
       if (err) {
         res.send(err);
       }
+      console.log('Player -->',player);
       Player.count({ 'teamID': player.teamID }, (err, number) => {
         if (err) {
           newTeam = {playersNo :0};
@@ -38,7 +40,7 @@ export class PlayerController {
   public getPlayer(req: Request, res: Response) {
     Player.find({}, (err, player) => {
       if (err) {
-
+        res.send(err);
       }
       res.json(player);
     })
