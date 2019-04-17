@@ -80,7 +80,7 @@ export class Schedulefill {
       };
     }
     if (this.excededGroups && this.groups === 0) {
-      for (let index = 0; index < this.groups; index++) {
+      for (let index = 0; index < this.excededGroups; index++) {
         await this.fillTeamPerGroup(this.teamsPerGruopExc);
         if (this.teamsID) {
           object.teamID = this.teamsID;
