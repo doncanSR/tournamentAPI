@@ -9,8 +9,12 @@ export const clasificationSchema = new Schema({
   },
   groupsId: {
     type: [String]
-  }, 
+  },
   level: {
     type: Number
+  },
+  tournamentID: {
+    type: String,
+    required: [true, 'TournamentId is needed']
   }
 });

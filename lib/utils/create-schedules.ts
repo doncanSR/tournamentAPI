@@ -9,16 +9,17 @@ export class createSchedule implements ScheduleInterface {
   correctTeams: number;
   totalClasifications:number;
   teamsPerGruopExc:number;
+  tournamentId:string;
 
-  constructor(teams: number) {
+  constructor(teams: number, tournamentId:string) {
     this.teams = teams;
+    this.tournamentId = tournamentId;
   }
   /**
    * buildSchedule
    */
   private buildSchedule(): void {
     if (this.teams < 6) {
-      console.log('this should be used the round robbin method');
 
     }
     if (this.teams >= 6 && this.teams < 25) {
@@ -41,46 +42,39 @@ export class createSchedule implements ScheduleInterface {
   private createClasification(): void {
     this.clasification = Math.log2(this.teams);
     this.clasification = parseInt(this.clasification.toFixed(1));
-    console.log('this is clasifications ----> ', this.clasification);
   }
 
   private createGroups(): void {
     this.groups = Math.log2(this.teams);
     this.groups = parseInt(this.groups.toFixed(1));
-    console.log('this is group when there is not clasifications ----> ', this.groups);
   }
 
   private numberGroups(): void {
     this.groups = (this.teams / this.clasification);
     this.groups = parseInt(this.groups.toFixed(1));
-    console.log('This is the number of group ----> ', this.groups);
   }
 
   private numberTeamPerGroup(): void {
     this.teamsPerGroup = (this.teams / this.groups);
     this.excededGroups = (this.teamsPerGroup - Math.floor(this.teamsPerGroup));
     this.teamsPerGroup = parseInt(this.teamsPerGroup.toFixed(1));
-    console.log('This is the teams per group ----> ', this.teamsPerGroup);
-    console.log('This is the rest ----> ', this.excededGroups);
   }
 
   private nGroupsExceded(): void {
     this.excededGroups = parseInt((this.excededGroups * this.groups).toFixed());
-    console.log('This is the number of excedded grups: ', this.excededGroups);
   }
 
   private groupInitialValue(): void {
     this.completeGroups = (this.groups - this.excededGroups);
     this.teamsPerGruopExc = (this.teamsPerGroup + 1);
-    console.log('This is the number of groups with the initial team values: ', this.completeGroups);
-    console.log('This is the number of groups with an extra team: ', this.excededGroups);
-    console.log('This is the number of extra teams ', this.teamsPerGruopExc);
+    if (this.completeGroups != this.groups) {
+      this.groups = this.completeGroups;
+    }
   }
 
   private clasifications(): void {
     this.totalClasifications = (this.groups / this.clasification);
-    this.totalClasifications = parseInt(this.totalClasifications.toFixed())
-    console.log('This is the clasifications total: ', this.totalClasifications);
+    this.totalClasifications = parseInt(this.totalClasifications.toFixed());
   }
 
   public verifyTeams(): boolean {
