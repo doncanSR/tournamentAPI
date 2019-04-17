@@ -19,7 +19,13 @@ export const teamSchema = new Schema({
     from: {
         type: String
     },
-    points: {
+    pointsClass: {
+        type: Number
+    },
+    pointsTotal: {
+        type: Number
+    },
+    sets: {
         type: Number
     },
     tournamentID: {

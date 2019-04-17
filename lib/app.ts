@@ -7,6 +7,7 @@ import * as corns from "cors"
 class App {
     public app: express.Application;
     public routerPrv: Routes = new Routes();
+    public julioUrl: string = 'mongodb://192.168.100.10:27017/tournamentDB';
     public mongoUrl: string = 'mongodb://localhost/tournamentDB';
 
     constructor() {
@@ -26,7 +27,8 @@ class App {
     }
     private mongoSetup(): void {
         mongoose.Promise = global.Promise;
-        mongoose.connect(this.mongoUrl);
+        // mongoose.connect(this.mongoUrl);
+        mongoose.connect(this.julioUrl);
     }
 }
 
