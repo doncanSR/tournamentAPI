@@ -16,25 +16,25 @@ export const matchSchema = new Schema({
     faseID: {
         type: String
     },
-    dateMatch: {
+    matchDate: {
         type: Date
     },
-    hourMatch: {
-        type: String
-    },
-    pointTeamOne: {
+    pointTOne: {
         type: Number
     },
-    pointTeamTwo: {
+    pointTTwo: {
         type: Number
     },
-    setsTeamOne: {
+    setTOne: {
         type: Number
     },
-    setsTeamTwo: {
+    setTTwo: {
         type: Number
     }, 
     refereeId: {
+        type: String
+    },
+    tournamentID: {
         type: String
     }
 });

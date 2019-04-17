@@ -30,7 +30,7 @@ export class TeamController {
   }
 
   /**
-   * getTornamentWithId
+   * getTeamWithId
    */
   public getTeamWithId(req: Request, res: Response) {
     Team.findById(req.params.teamId, (err, team) => {

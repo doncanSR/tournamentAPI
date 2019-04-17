@@ -15,5 +15,8 @@ export const refereeSchema = new Schema({
     },
     association: {
         type: String
+    },
+    tournamentID: {
+        type: String
     }
 })
