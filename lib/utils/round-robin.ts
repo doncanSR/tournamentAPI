@@ -14,7 +14,7 @@ export class RoundRobin {
     this.tournmanetID = tournmanetID;
   }
 
-  public combine() {
+  private combine(): void {
     let buffer: string = this.teams[this.teams.length - 1];
     for (let i = this.teams.length - 1; i > 1; i--) {
       this.teams[i] = this.teams[i - 1];
@@ -22,7 +22,7 @@ export class RoundRobin {
     this.teams[1] = buffer;
   }
 
-  public async addMatch() {
+  private async addMatch() {
     let object = {
       teamOne: '',
       teamTwo: ''
@@ -37,13 +37,11 @@ export class RoundRobin {
   /**
    * init
    */
-  public init() {
+  public init(): void {
     this.rounds = (this.teams.length - 1);
     for (let i = 0; i < this.rounds; i++) {
       this.addMatch();
       this.combine();
-      console.log('Round number = ', i + 1);
-      console.log('*************************************');
     }
   }
 

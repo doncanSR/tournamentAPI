@@ -46,6 +46,7 @@ export class Schedulefill {
 
   private createClassifications(): void {
     let object = { level: 0, tournamentID: this.tournamentId };
+    //create groups per clasifications and check fase that it is 
     for (let index = 0; index < this.totalClasifications; index++) {
       object.level = index + 1;
       let newClassification = new Classification(object)
@@ -114,10 +115,8 @@ export class Schedulefill {
         this.teamsID[i] = this.allTeams[numberRan]._id.toString();
         this.allTeams.splice(numberRan, 1);
       }
-      console.log('random team was called', this.teamsID);
     } else {
       this.teamsID = null;
-      console.log('All the teams were used');
     }
   }
 

@@ -6,4 +6,6 @@ export interface ScheduleInterface {
   teamsPerGruopExc:number;
   totalClasifications:number;
   tournamentId:string;
+  teamsPerclassifications:number,
+  groupsPerClassifications:number
 }
