@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 export const teamSchema = new Schema({
-    id: {
+    _id: {
         type: Schema.Types.ObjectId
     },
     name: {
