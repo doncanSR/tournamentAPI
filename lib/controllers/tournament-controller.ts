@@ -1,8 +1,8 @@
 import * as mongoose from 'mongoose';
-import { tournmanetSchema } from '../models/tournament-model';
+import { tournamentSchema } from '../models/tournament-model';
 import { Request, Response } from 'express';
 
-const Tournament = mongoose.model('Tournament', tournmanetSchema);
+const Tournament = mongoose.model('Tournament', tournamentSchema);
 
 export class TournamentController {
   public addNewTournament(req: Request, res: Response) {

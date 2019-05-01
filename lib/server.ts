@@ -3,13 +3,14 @@ import { createSchedule } from "./utils/create-schedules";
 import { Schedulefill } from "./utils/schedules-fill";
 import { ScheduleInterface } from "./utils/interfaces/schedule-interface";
 import { addPoints } from "./utils/addPoints";
-import { MatchDataInterface } from "utils/interfaces/matchData-interface";
+import { MatchDataInterface } from "./utils/interfaces/matchData-interface";
+import { schedules } from "./utils/schedules";
 const PORT = 3000;
 
 app.listen(PORT, () => {
 	console.log('Express server listening on port ', PORT);
 
-	// let schedules = new createSchedule(24, '5bb975f97ccc872a398cfc25');
+	// let schedules = new createSchedule(25, '5c6c8c4632600327ae2046c2');
 	// let isCorrect: boolean = schedules.verifyTeams();
 	// let scheduleData: ScheduleInterface;
 	// console.log('This is the result ', schedules);
@@ -19,20 +20,20 @@ app.listen(PORT, () => {
 	// let fillSchedules = new Schedulefill(scheduleData);
 	// fillSchedules.fill();
 
-	let match: MatchDataInterface;
-	match = {
-		teamOne: '5cb80d481d8bd1c2bfddf844',
-		teamTwo: '5cb80d481d8bd1c2bfddf848',
-		setsTO: 2,
-		setsTT: 1,
-		totalPointsTO: 65,
-		totalPointsTT: 40,
-		tournamentID: '5bb975f97ccc872a398cfc25'
-	  }
-	let games = new addPoints(2);
-	games.wasAdded(match);
+	// let match: MatchDataInterface;
+	// match = {
+	// 	teamOne: '5cbe1c56a6315754b74f8e60',
+	// 	teamTwo: '5cbe1c56a6315754b74f8e5f',
+	// 	setsTO: 2,
+	// 	setsTT: 0,
+	// 	pointsTO: 50,
+	// 	pointsTT: 30,
+	// 	tournamentID: '5c6c8c4632600327ae2046c2'
+	//   }
+	// let games = new addPoints(2);
+	// games.wasAdded(match);
 
-	
-
+	let making = new schedules();
+	making.possible('5c6c8c4632600327ae2046c2');
 
 });

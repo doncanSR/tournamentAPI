@@ -1,21 +1,21 @@
 import { MatchDataInterface } from "./interfaces/matchData-interface";
 import { teamSchema } from "../models/team-model";
 import * as mongoose from 'mongoose';
-import { TeamController } from "controllers/team-controller";
 
 const Team = mongoose.model('Team', teamSchema);
 
 export class addPoints implements MatchDataInterface {
+    pointsTO: number;
+    pointsTT: number;
 
     totalPointsTO: any;
     totalPointsTT: any;
-    added: boolean;
-    totalMatches: number
-    ;
+    totalMatches: number;
+    matches: number;
     private totalPointsClassTO: any;
     private totalPointsClassTT: any;
-    private totalPointsMatchTO: number;
-    private totalPointsMatchTT: number;
+    private totalPointsMatchTO: any;
+    private totalPointsMatchTT: any;
     teamOne: string;
     teamTwo: string;
     setsTO: number;
@@ -23,9 +23,12 @@ export class addPoints implements MatchDataInterface {
     totalSetsTO: any;
     totalSetsTT: any;
     tournamentID: string;
+    list: any;
+    orderedList: any;
 
     constructor(matches: number){
         this.totalMatches = matches;
+        this.matches = 0;
     }
 
     private async updatePoints(){
@@ -35,93 +38,110 @@ export class addPoints implements MatchDataInterface {
         this.totalSetsTO += this.setsTO;
         this.totalSetsTT += this.setsTT;
 
+        //Who is the winner??
         if(this.setsTO > this.setsTT){
             this.totalPointsTO += this.totalPointsMatchTO - this.totalPointsMatchTT;
             if (this.setsTT === 0) {
-                //Agrega 3 puntos a TO
+                //Add 3 points to TO
                 this.totalPointsClassTO += 3;
-                await Team.findOneAndUpdate({ _id: this.teamOne },{ 
-                    pointsTotal: this.totalPointsTO,
-                    pointsClass: this.totalPointsClassTO
-                });
-
             }else{
+                //Add 2 points to TO and 1 to TT
                 this.totalPointsClassTO += 2;
                 this.totalPointsClassTT += 1;
-                await Team.findOneAndUpdate({ _id: this.teamOne },{ 
-                    pointsTotal: this.totalPointsTO,
-                    pointsClass: this.totalPointsClassTO
-                });
-                await Team.findOneAndUpdate({ _id: this.teamTwo },{ 
-                    pointsClass: this.totalPointsClassTT
-                });
-                //Agrega 2 puntos a TO y 1 a TT
             }
         }else{
             this.totalPointsTT += this.totalPointsMatchTT - this.totalPointsMatchTO;
             if (this.setsTO === 0) {
-                //Agrega 3 puntos a TT
+                //Add 3 points to TT
                 this.totalPointsClassTT += 3;
-                await Team.findOneAndUpdate({ _id: this.teamTwo },{ 
-                    pointsTotal: this.totalPointsTT,
-                    pointsClass: this.totalPointsClassTT
-                });
-
             }else{
+                //Add 2 points to TT and 1 to TO
                 this.totalPointsClassTT += 2;
                 this.totalPointsClassTO += 1;
-                await Team.findOneAndUpdate({ _id: this.teamTwo },{ 
-                    pointsTotal: this.totalPointsTT,
-                    pointsClass: this.totalPointsClassTT
-                });
-                await Team.findOneAndUpdate({ _id: this.teamOne },{ 
-                    pointsClass: this.totalPointsClassTO
-                });
-                //Agrega 2 puntos a TT y 1 a TO
             }
         }
+        await Team.findOneAndUpdate({ _id: this.teamOne },{ 
+            pointsTotal: this.totalPointsTO,
+            pointsClass: this.totalPointsClassTO,
+            sets: this.totalSetsTO
+        });
+        await Team.findOneAndUpdate({ _id: this.teamTwo },{ 
+            pointsTotal: this.totalPointsTT,
+            pointsClass: this.totalPointsClassTT,
+            sets: this.totalSetsTT
+        });
+
+        return this.registredMatch();
     }
 
         
-    wasAdded(matchData: MatchDataInterface): boolean {
+    async wasAdded(matchData: MatchDataInterface) {
         
-        this.totalPointsMatchTO = matchData.totalPointsTO;
-        this.totalPointsMatchTT = matchData.totalPointsTT;
         this.teamOne = matchData.teamOne;
         this.teamTwo = matchData.teamTwo;
         this.setsTO = matchData.setsTO;
         this.setsTT = matchData.setsTT;
+        this.totalPointsMatchTO = matchData.pointsTO;
+        this.totalPointsMatchTT = matchData.pointsTT;
         this.tournamentID = matchData.tournamentID;
-        this.added = false;
-
-        this.updatePoints();
-            
-            
-
-
-
         
-        this.added = true;
-        return this.added;
+        return await this.updatePoints();
     }
     
     private async getTotalPoints(){
+        
+        //Get all points
 
-        this.totalPointsClassTO = await Team.findOne({ '_id': this.teamOne}, {'pointsClass':1, '_id':0});
-        this.totalPointsClassTO = this.totalPointsClassTO.pointsClass || 0;
-        this.totalPointsClassTT = await Team.findOne({ '_id': this.teamTwo}, {'pointsClass':1, '_id':0});
-        this.totalPointsClassTT = this.totalPointsClassTT.pointsClass || 0;
-        this.totalPointsTO = await Team.find({_id: this.teamOne }, {'pointsTotal':1, '_id':0});
-        this.totalPointsTO = this.totalPointsTO.pointsTotal || 0;
-        this.totalPointsTT = await Team.find({_id: this.teamTwo }, {'pointsTotal':1, '_id':0});
-        this.totalPointsTT = this.totalPointsTT.pointsTotal || 0;
-        this.totalSetsTO = await Team.find({_id: this.teamOne }, {'sets':1, '_id':0});
-        this.totalSetsTO = this.totalSetsTO.sets || 0;        
-        this.totalSetsTT = await Team.find({_id: this.teamTwo }, {'sets':1, '_id':0});
-        this.totalSetsTT = this.totalSetsTT.sets || 0;        
+        await Team.findById(this.teamOne).then((team) => {
+            this.totalPointsClassTO = team.pointsClass || 0;
+            this.totalPointsTO = team.pointsTotal || 0;
+            this.totalSetsTO = team.sets || 0;        
+        });
 
-        console.log(this.totalPointsClassTO);
-        console.log(this.totalPointsClassTT);
+        await Team.findById(this.teamTwo).then((team) => {
+            this.totalPointsClassTT = team.pointsClass || 0;
+            this.totalPointsTT = team.pointsTotal || 0;
+            this.totalSetsTT = team.sets || 0;        
+        });
+    }
 
+    registredMatch(){
+        
+        this.matches++;
+        if (this.matches < this.totalMatches)
+            return false;    //Continue with the games
+        else
+            return true; //Throw the list
+    }
+
+    bubbleSort = arr => {
+        const l = arr.length;
+        for (let i = 0; i < l; i++) {
+            for (let j = 0; j < l - 1 - i; j++) {
+                if (arr[j].pointsClass > arr[j + 1].pointsClass) {
+                    //The best in pairs by Points Class
+                    [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                } else if (arr[j].pointsClass === arr[j + 1].pointsClass) {
+                    //It's a tie by points
+                    if (arr[j].sets > arr[j + 1].sets) {
+                        //The best in pairs by Sets
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                    } else if (arr[j].sets === arr[j + 1].sets) {
+                        //It's a tie by sets
+                        if (arr[j].pointsTotal > arr[j + 1].pointsTotal) {
+                            //The best in pairs by Total Points
+                            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        }
+                    }
+                }
+            }
+        }
+        return arr;
+      };
+
+    async getList(){
+        this.list = await Team.find({ 'tournamentID': '5c6c8c4632600327ae2046c2'}, {});
+        this.orderedList = this.bubbleSort(this.list);
+        return this.orderedList;
     }
 }

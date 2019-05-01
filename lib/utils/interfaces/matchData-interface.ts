@@ -3,7 +3,7 @@ export interface MatchDataInterface {
     teamTwo: string;
     setsTO:number;
     setsTT: number;
-    totalPointsTO:number;
-    totalPointsTT:number;
+    pointsTO: number;
+    pointsTT: number;
     tournamentID: string;
   }
