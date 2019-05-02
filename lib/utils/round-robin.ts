@@ -14,35 +14,27 @@ export class RoundRobin {
     this.tournmanetID = tournmanetID;
   }
 
-  private combine(): void {
-    let buffer: string = this.teams[this.teams.length - 1];
-    for (let i = this.teams.length - 1; i > 1; i--) {
-      this.teams[i] = this.teams[i - 1];
-    }
-    this.teams[1] = buffer;
-  }
 
   private async addMatch() {
     let object = {
       teamOne: '',
       teamTwo: ''
     };
-    for (let i = 0, j = this.teams.length - 1; i < j; i++ , j--) {
-      console.log(this.teams[i] + " vs " + this.teams[j]);
-      object.teamOne = this.teams[i];
-      object.teamTwo = this.teams[j];
-      await this.saveMatch(object);
+    for (let i = 0; i < this.teams.length - 1; i++) {
+        for(let j = i + 1; j < this.teams.length; j++){
+          object.teamOne = this.teams[i];
+          object.teamTwo = this.teams[j];
+          await this.saveMatch(object);
+        }
     }
   }
   /**
    * init
    */
-  public init(): void {
+  public async init() {
     this.rounds = (this.teams.length - 1);
-    for (let i = 0; i < this.rounds; i++) {
-      this.addMatch();
-      this.combine();
-    }
+    await this.addMatch();
+    
   }
 
   private async saveMatch(object: any) {
