@@ -3,6 +3,8 @@ import { teamSchema } from "../models/team-model";
 import * as mongoose from 'mongoose';
 import { groupSchema } from "../models/group-model";
 import { clasificationSchema } from "../models/clasificatio.model";
+import { RoundRobin } from "./round-robin";
+import { Schedules } from "./schedules"
 
 const Team = mongoose.model('Team', teamSchema);
 const Group = mongoose.model('Group', groupSchema);
@@ -33,11 +35,11 @@ export class Schedulefill {
    */
   public async fill() {
     await this.getTeams();
-    if (this.totalClasifications) {
+    if (this.totalClasifications && this.totalClasifications > 3) {
       this.createClassifications();
-      this.createGroups();
+      await this.createGroups();
     } else {
-      this.createGroups();
+      await this.createGroups();
     }
   }
   private async getTeams() {
@@ -46,6 +48,7 @@ export class Schedulefill {
 
   private createClassifications(): void {
     let object = { level: 0, tournamentID: this.tournamentId };
+    //create groups per clasifications and check fase that it is 
     for (let index = 0; index < this.totalClasifications; index++) {
       object.level = index + 1;
       let newClassification = new Classification(object)
@@ -64,7 +67,7 @@ export class Schedulefill {
     });
   }
 
-  private async createGroups(): Promise<void> {
+  private async createGroups() {
     let object = { nameGroup: 0, tournamentID: this.tournamentId, teamID: [] };
 
     for (let index = 0; index < this.groups; index++) {
@@ -94,17 +97,16 @@ export class Schedulefill {
         };
       }
     }
-    Group.find({}, (err, groups) => {
-      if (err) {
-        console.log('Something went wrong, ', err);
-      }
-      console.log('Here are all the teams: ', groups);
-    });
+    let schedulesFinal = new Schedules(this.tournamentId);
+    schedulesFinal.getTournamentInfo();
   }
 
   private async saveGroup(object: any) {
     let newGroup = new Group(object);
-    await newGroup.save();
+    let group;
+    group = await newGroup.save();
+    let rr = new RoundRobin(group.teamID, group.nameGroup, group.tournamentID);
+    await rr.init();
   }
   private async fillTeamPerGroup(teamsPerGroup: number) {
     let numberRan: number;
@@ -114,10 +116,8 @@ export class Schedulefill {
         this.teamsID[i] = this.allTeams[numberRan]._id.toString();
         this.allTeams.splice(numberRan, 1);
       }
-      console.log('random team was called', this.teamsID);
     } else {
       this.teamsID = null;
-      console.log('All the teams were used');
     }
   }
 

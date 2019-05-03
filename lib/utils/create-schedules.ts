@@ -8,6 +8,8 @@ export class createSchedule implements ScheduleInterface {
   completeGroups: number;
   correctTeams: number;
   totalClasifications:number;
+  groupsPerClassifications:number;
+  teamsPerclassifications:number;
   teamsPerGruopExc:number;
   tournamentId:string;
 
@@ -71,10 +73,14 @@ export class createSchedule implements ScheduleInterface {
       this.groups = this.completeGroups;
     }
   }
-
+//add the methos to created exceded gourps
   private clasifications(): void {
     this.totalClasifications = (this.groups / this.clasification);
     this.totalClasifications = parseInt(this.totalClasifications.toFixed());
+    this.teamsPerclassifications = parseInt((this.teams / this.totalClasifications).toFixed())
+    this.groupsPerClassifications = Math.log2(this.teamsPerclassifications);
+    this.groupsPerClassifications = parseInt(this.groupsPerClassifications.toFixed(1));
+
   }
 
   public verifyTeams(): boolean {

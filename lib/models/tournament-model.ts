@@ -9,21 +9,34 @@ export const tournamentSchema = new Schema({
     },
     name: {
         type: String,
-        required: 'Enter a last name'
+        required: 'Enter tournament name'
     },
-    startDate: {
-        type: Date
+    starDate: {
+        type: Date,
+         required: 'Enter starDate'
     },
-    endDate: {
-        type: Date
+    EndDate: {
+        type: Date,
+         required: 'Enter EndDate '
     },
     state: {
-        type: String
+        type: String,
+         required: 'Enter state '
     },
     city: {
-        type: String
+        type: String,
+         required: 'Enter city '
     },
     headquarters: {
-        type: String
-    }
+        type: String,
+         required: 'Enter headquarters '
+    },
+    courts: {
+        type: String,
+         required: 'Enter courts '
+    },
+    hoursPerDay: {
+        type: Number,
+         required: 'Enter hoursPerDay '
+    },
 });

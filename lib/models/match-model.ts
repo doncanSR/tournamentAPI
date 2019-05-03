@@ -16,7 +16,10 @@ export const matchSchema = new Schema({
     faseID: {
         type: String
     },
-    matchDate: {
+    court:{
+        type: String
+    },
+    dateMatch: {
         type: Date
     },
     pointTOne: {
