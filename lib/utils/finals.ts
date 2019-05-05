@@ -17,13 +17,13 @@ export class Finals {
 
   public areThereTime(): void {
     if (this.areTime) {
-      this.createEighth();
+      //this.createEighth();
     } else {
-      this.createFinals();
+      //this.createFinals();
     }
   }
 
-  private async createEighth() {
+  private async defineEighth(orderedList) {
     let object = { teamId: '', tournamentID: this.tournamentId, catFaseId: '5cb802fc3259cd048a783696' };
     let finalistTeams;
     // this.finalistTeams = await Team.find({ 'tournamentID': this.tournamentId }, '_id');
@@ -39,7 +39,6 @@ export class Finals {
       objectMatch.teamTwo = finalistTeams[last - (i + 1)];
       let newMatch = new Match(objectMatch);
       await newMatch.save();
-
     }
   }
 

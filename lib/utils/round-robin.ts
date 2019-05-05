@@ -16,10 +16,7 @@ export class RoundRobin {
 
 
   private async addMatch() {
-    let object = {
-      teamOne: '',
-      teamTwo: ''
-    };
+    let object = {teamOne: '', teamTwo: ''};
     for (let i = 0; i < this.teams.length - 1; i++) {
         for(let j = i + 1; j < this.teams.length; j++){
           object.teamOne = this.teams[i];

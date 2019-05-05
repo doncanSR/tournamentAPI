@@ -52,12 +52,12 @@ export class Schedulefill {
     for (let index = 0; index < this.totalClasifications; index++) {
       object.level = index + 1;
       let newClassification = new Classification(object)
-      newClassification.save((err, classification) => {
-        if (err) {
-          console.log('Something went wrong, ', err);
-        }
-        console.log('this is the number of ', classification);
-      });
+      // newClassification.save((err, classification) => {
+      //   if (err) {
+      //     console.log('Something went wrong, ', err);
+      //   }
+      //   console.log('this is the number of ', classification);
+      // });
     }
     Classification.find({}, (err, clasificatios) => {
       if (err) {
@@ -104,9 +104,9 @@ export class Schedulefill {
   private async saveGroup(object: any) {
     let newGroup = new Group(object);
     let group;
-    group = await newGroup.save();
-    let rr = new RoundRobin(group.teamID, group.nameGroup, group.tournamentID);
-    await rr.init();
+    //group = await newGroup.save();
+    //let rr = new RoundRobin(group.teamID, group.nameGroup, group.tournamentID);
+    //await rr.init();
   }
   private async fillTeamPerGroup(teamsPerGroup: number) {
     let numberRan: number;

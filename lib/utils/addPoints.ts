@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 
 const Team = mongoose.model('Team', teamSchema);
 
-export class addPoints implements MatchDataInterface {
+export class AddPoints implements MatchDataInterface {
     pointsTO: number;
     pointsTT: number;
 

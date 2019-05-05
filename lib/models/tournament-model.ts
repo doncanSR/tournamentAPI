@@ -32,7 +32,7 @@ export const tournamentSchema = new Schema({
          required: 'Enter headquarters '
     },
     courts: {
-        type: String,
+        type: Number,
          required: 'Enter courts '
     },
     hoursPerDay: {
