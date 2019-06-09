@@ -105,7 +105,7 @@ export class Schedulefill {
     let newGroup = new Group(object);
     let group;
     group = await newGroup.save();
-    let rr = new RoundRobin(group.teamID, group.nameGroup, group.tournamentID);
+    let rr = new RoundRobin(group.teamID, group._id.toString(), group.tournamentID);
     await rr.init();
   }
   private async fillTeamPerGroup(teamsPerGroup: number) {
