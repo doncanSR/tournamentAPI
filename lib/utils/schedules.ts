@@ -85,19 +85,21 @@ export class Schedules {
             id: groupWithMoreMatches[i]._id.toString(),
             court: courtWithMoreAvailability[0].name,
           };
+          //this.matchUpdate(matchOne);
           let matchTwo = {
             dateMatch: courtWithMoreAvailability[0].dayHours[indexC + 1],
             id: groupWithMoreMatches[groupWithMoreMatches.length - 1]._id.toString(),
             court: courtWithMoreAvailability[0].name,
           };
+          //this.matchUpdate(matchTwo);
           // console.log('the first match ==> ', matchOne);
           // console.log('the last match ==> ', matchTwo);
           break;
         }
-        
+
       }
       groupWithMoreMatches.forEach((m) => {
-        
+
       });
     });
     console.log('max groupId ===> ', maxGroup[0]._id.toString());
@@ -152,7 +154,11 @@ export class Schedules {
    * @description it should update the match with its time and court
    */
   private async matchUpdate(match) {
-    return Match.findOneAndUpdate({ _id: match.id }, match, { upsert: true, new: true });
+    if (this.fourRules(match)) {
+      Match.findOneAndUpdate({ _id: match.id }, match, { upsert: true, new: true });
+    } else {
+      //call handler error
+    }
   }
 
 }
