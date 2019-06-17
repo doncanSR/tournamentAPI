@@ -2,10 +2,12 @@ import { tournmanetSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 import { groupSchema } from "../models/group-model";
+import { CourtSchema } from "../models/court-model";
 
 const Match = mongoose.model('Match', matchSchema);
 const Group = mongoose.model('Group', groupSchema)
 const Tournament = mongoose.model('Tournament', tournmanetSchema);
+const Court = mongoose.model('Court', CourtSchema)
 
 export class Schedules {
   tournamentId: string;
@@ -64,34 +66,53 @@ export class Schedules {
    * Will fill all the schedule according the four rules method
    */
   public async schedulefill() {
-    let teamsPerGroup: number[] = [];
+    let courtWithMoreAvailability = await Court.find({}).sort({ 'availability': -1 }).limit(1);
+    console.log('groupWithMoreMatches ===> ', courtWithMoreAvailability);
     let maxGroup = await Group.aggregate([
       { $unwind: "$teamID" },
       { $group: { _id: "$_id", teamNumber: { $sum: 1 } } },
       { $sort: { len: -1 } },
       { $limit: 1 }
     ]);
-    teamsPerGroup.push(maxGroup[0].teamNumber)
-    // let matches = Match.find({})
-    let groups = await Group.find({ 'tournamentID': this.tournamentId });
-    groups.forEach(group => {
-      if (!teamsPerGroup.includes(group.teamID.length)) {
-        teamsPerGroup.push(group.teamID.length)
+    let groupWithMoreMatches = await Match.find({ groupName: maxGroup[0]._id.toString() });
+
+    courtWithMoreAvailability[0].dayHours.forEach((c, indexC) => {
+      console.log('the time match', c);
+      for (let i = 0; i < groupWithMoreMatches.length; i++) {
+        if (!groupWithMoreMatches[i].dateMatch) {
+          let matchOne = {
+            dateMatch: c,
+            id: groupWithMoreMatches[i]._id.toString(),
+            court: courtWithMoreAvailability[0].name,
+          };
+          let matchTwo = {
+            dateMatch: courtWithMoreAvailability[0].dayHours[indexC + 1],
+            id: groupWithMoreMatches[groupWithMoreMatches.length - 1]._id.toString(),
+            court: courtWithMoreAvailability[0].name,
+          };
+          // console.log('the first match ==> ', matchOne);
+          // console.log('the last match ==> ', matchTwo);
+          break;
+        }
+        
       }
+      groupWithMoreMatches.forEach((m) => {
+        
+      });
     });
-    let groupWithMajorMatches = await Match.find({ groupName: maxGroup[0]._id.toString() });
-    console.log('all the matches: ', groupWithMajorMatches);
-    console.log('all the matches, for the group with more teams: ', groupWithMajorMatches.length / 2);
+    console.log('max groupId ===> ', maxGroup[0]._id.toString());
 
   }
 
   /**
    * fourRules
-   * it helps to know if the match culd be scheduled
-   * Accourding the four rules
+   * @param match
+   * @description it helps to know if the match culd be scheduled Accourding the four rules,
+   * and it will return a bolean when all the rules are valid. 
+   * @returns boolean primise
+   * 
    */
   public async fourRules(match: any): Promise<boolean> {
-    let isCorrect = false;
     let ruleOne = true;
     let ruleTwo = true;
     let ruleThree = true;
@@ -123,6 +144,15 @@ export class Schedules {
         ruleFour = false;
       }
     });
-    return isCorrect = (ruleOne && ruleTwo && ruleThree && ruleFour) ? true : false;
+    return (ruleOne && ruleTwo && ruleThree && ruleFour);
   }
+  /**
+   * matchUpdate
+   * @param match
+   * @description it should update the match with its time and court
+   */
+  private async matchUpdate(match) {
+    return Match.findOneAndUpdate({ _id: match.id }, match, { upsert: true, new: true });
+  }
+
 }
