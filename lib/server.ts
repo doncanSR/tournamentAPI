@@ -22,7 +22,7 @@ app.listen(PORT, () => {
 	// finals.areThereTime();
 
 	let schedule = new Schedules('5bb975f97ccc872a398cfc25');
-	schedule.schedulefill();
+	schedule.scheduleInit();
 
 
 });
