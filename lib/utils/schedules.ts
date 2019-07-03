@@ -13,7 +13,7 @@ export class Schedules {
   tournamentId: string;
   courts: number;
   hoursPerDay: number;
-  days: number;
+  days: string[] = [];
   matchesPerDay: number;
   allPosibleMatches: number;
 
@@ -26,9 +26,17 @@ export class Schedules {
     */
   public async getTournamentInfo() {
     let tournament = await Tournament.find({ '_id': this.tournamentId });
+    let diffDays = 0;
+    let allDays: string[] = [];
     this.courts = tournament[0].courts;
     this.hoursPerDay = tournament[0].hoursPerDay;
-    this.days = (tournament[0].EndDate.getDate() - tournament[0].starDate.getDate() + 1);
+    diffDays = tournament[0].EndDate.getDate() - tournament[0].starDate.getDate();
+    for (let i = 0; i <= diffDays; i++) {
+      let dToSave = new Date();
+      dToSave.setDate(tournament[0].starDate.getDate() + i)
+      allDays.push(dToSave.toISOString());
+    }
+    this.days = allDays;
     // this.distributeMatches();
   }
 
@@ -36,7 +44,7 @@ export class Schedules {
     let matchTime = 1;
     let posibleMatches: number;
     this.matchesPerDay = (this.hoursPerDay / matchTime) * (this.courts);
-    this.allPosibleMatches = this.matchesPerDay * this.days;
+    this.allPosibleMatches = this.matchesPerDay * this.days.length;
     let matchesCreated = await Match.countDocuments({ 'tournamentID': this.tournamentId });
 
     //Refactor
@@ -78,7 +86,7 @@ export class Schedules {
       // { $limit: 1 }
     ]);
     await this.getTournamentInfo();
-    for (let i = 0; i < this.days; i++) {
+    for (let i = 0; i < this.days.length; i++) {
       let day = [];
       for (const court of courts) {
         let ct = {
@@ -121,27 +129,24 @@ export class Schedules {
         for (let k = 0; k < days[i][j].hours.length; k++) {
           for (let l = 0; l < groups.length; l++) {
             for (let m = 0; m < groups[l].matches.length; m++) {
-              console.log('groupsm ===> ',groups[l].matches[m]);
-              console.log('hora ===> ',days[i][j].hours[k]);
-              this.matchUpdate(groups[l].matches[m], days[i][j].hours);
-            }            
+              this.matchUpdate(groups[l].matches[m], days[i][j].hours[k].hours, i);
+            }
           }
-          
-        }        
-      }      
+
+        }
+      }
     }
   }
   /**
    * fourRules
    * @param match
-   * @param hour
    * @description it helps to know if the match culd be scheduled Accourding the four rules,
    * and it will return a bolean when all the rules are valid.
    * Validate with hour or idMatch 
    * @returns boolean primise
    * 
    */
-  public async fourRules(match: any, hour): Promise<boolean> {
+  public async fourRules(match: any): Promise<boolean> {
     let ruleOne = true;
     let ruleTwo = true;
     let ruleThree = true;
@@ -160,9 +165,11 @@ export class Schedules {
         ruleOne = false;
       }
       //rule two, a team can not wait more than 3 hrs.
-      let subs = -1 * (m.dateMatch.getHours() - match.dateMatch.getHours());
-      if (subs >= 3) {
-        ruleTwo = false;
+      if (m.dateMatch) {
+        let subs = -1 * (m.dateMatch.getHours() - match.dateMatch.getHours());
+        if (subs >= 3) {
+          ruleTwo = false;
+        }
       }
       //rule three check distance and time to move
       //rule four one team can not play three time in a day.
@@ -181,9 +188,16 @@ export class Schedules {
    * @param hour
    * @description it should update the match with its time and court
    */
-  private async matchUpdate(match, hour) {
-    if (this.fourRules(match,hour)) {
-      Match.findOneAndUpdate({ _id: match.id }, match, { upsert: true, new: true });
+  private async matchUpdate(match, hour, day) {
+    let matchToUpdate = match;
+    let dateMatch = new Date(Date.parse(this.days[day]));
+    dateMatch.setHours(parseInt(hour[0]));
+    match.dateMatch = dateMatch;
+    let correct = await this.fourRules(match);
+    console.log('this is the match ==> ', match);
+
+    if (correct) {
+      // Match.findOneAndUpdate({ _id: match.id }, match, { upsert: true, new: true });
     } else {
       return;
     }
