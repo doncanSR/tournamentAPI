@@ -176,7 +176,7 @@ export class Schedules {
    * fitnessFunction
    * @param gMatch
    * @param individual
-   * @description it the score function, where evalute each gen inside the individual
+   * @description it is the score function, where evalute each gen inside the individual
    * @returns score
    * 
    */
