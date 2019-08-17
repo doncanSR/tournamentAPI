@@ -16,7 +16,7 @@ export const matchSchema = new Schema({
     faseID: {
         type: String
     },
-    court:{
+    court: {
         type: String
     },
     dateMatch: {
@@ -28,12 +28,15 @@ export const matchSchema = new Schema({
     pointTTwo: {
         type: Number
     },
+    groupName: {
+        type: String
+    },
     setTOne: {
         type: Number
     },
     setTTwo: {
         type: Number
-    }, 
+    },
     refereeId: {
         type: String
     },

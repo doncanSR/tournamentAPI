@@ -55,12 +55,8 @@ mongod
 once you start mongo server, you should run the api, in the API folder with the following command:
 
 ```
-<<<<<<< HEAD
 npm run build
 npm run dev
-=======
-yarn dev
->>>>>>> cc67b467919df1dc3a673f37cca26473299685ee
 ```
 
 ## Code version syntax

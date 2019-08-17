@@ -11,6 +11,7 @@ import { MatchController } from "../controllers/match-controller";
 import { RefereeController } from "../controllers/referee-controller";
 import { VerifyToken } from "../utils/verifyTokem";
 import { Roles } from "../controllers/roles-controller";
+import { CourtController } from "../controllers/court-controller";
 
 export class Routes {
 
@@ -24,6 +25,7 @@ export class Routes {
   public refereeController: RefereeController = new RefereeController();
   public role: Roles = new Roles();
   public verifyToken: VerifyToken = new VerifyToken();
+  public courtController: CourtController = new CourtController();
 
   public routes(app): void {
     //Server status
@@ -82,6 +84,12 @@ export class Routes {
     // Capturist
     app.route('/capturist')
       .get(this.verifyToken.check, this.role.levelOne, this.role.getCapturist)
+    // Court
+    app.route('/court')
+      .get(this.courtController.getCourt)
+      .post(this.courtController.addNewCourt)
+      .delete(this.courtController.deleteCourt)
+      .put(this.courtController.updateCourt)
     // Match
     app.route('/match')
       .get(this.matchController.getMatch)
