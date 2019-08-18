@@ -87,42 +87,14 @@ export class Schedules {
    */
   public async scheduleInit() {
 
-
-    let groups = [];
-    let days = [];
-    let worseIndividual = { days: [], score: 0 };
-    let bestIndividual = { days: [], score: 9999 };
-    let index = 0
     await this.getTournamentInfo();
-
-    for (const group of this.maxGroup) {
-      let matches = await Match.find({ 'groupName': group._id.toString() });
-      let gp = {
-        id: group._id.toString(),
-        matches: matches
-      };
-      groups.push(gp);
-    }
-    for (index; index < 400; index++) {
-      let individual = { days: [], score: 0 };
-      let days = this.createDays();
-      let i;
-      individual.days = this.createIndividual(groups, days);
-      i = this.fitnessFunction(individual);
-      if (i.score > worseIndividual.score) {
-        worseIndividual = i;
-      }
-      if (i.score < bestIndividual.score) {
-        bestIndividual = i;
-      }
-    }
-    console.log('Best: ', bestIndividual);
-    console.log('Worse: ', worseIndividual);
-    console.log('poblation number: ', index);
+    let matches = await Match.find({});
+    let days = this.createDays();
+    
   }
   /**
    * createDays
-   * @Description 
+   * @Description Vreate objec day it has the schedule per day 
    * @returns days object
    */
   private createDays(): any {
@@ -149,53 +121,29 @@ export class Schedules {
   }
 
   /**
-   * individual
-   * @param groups
-   * @param days
-   * @returns an individual
-   */
-  private createIndividual(groups, days) {
-    let complete = this.matchesCreated.length;
-
-    while (complete !== 0) {
-      let randomGroup = Math.floor(Math.random() * groups.length);
-      let randomMatch = Math.floor(Math.random() * groups[randomGroup].matches.length);
-      let randomDay = Math.floor(Math.random() * days.length);
-      let randomCourt = Math.floor(Math.random() * days[randomDay].length);
-      let randomHour = Math.floor(Math.random() * days[randomDay][randomCourt].hours.length);
-      if (!days[randomDay][randomCourt].hours[randomHour].matchId) {
-        days[randomDay][randomCourt].hours[randomHour].matchId = groups[randomGroup].matches[randomMatch]._id.toString();
-        complete--;
-      }
-
-
-    }
-    return days;
-  }
-  /**
-   * fitnessFunction
-   * @param gMatch
-   * @param individual
-   * @description it is the score function, where evalute each gen inside the individual
-   * @returns score
    * 
+   * @param Matches 
+   * @param Days 
+   * @returns a schedule per day
    */
-  private fitnessFunction(individual): any {
-    let score = 0;
-    for (let i = 0; i < individual.days.length; i++) {
-      for (let j = 0; j < individual.days[i].length; j++) {
-        for (let k = 0; k < individual.days[i][j].hours.length; k++) {
-          score += this.ruleOne(individual.days[i], individual.days[i][j].hours[k].matchId, k, j);
-          score += this.ruleTwo(individual.days[i][j].hours, individual.days[i][j].hours[k].matchId);
-          score += this.ruleThree(individual.days[i][j].hours, individual.days[i][j].hours[k].matchId);
-          score += this.ruleFour(individual.days.length, individual.days[i][j].hours);
-        }
-      }
-    }
-    individual.score = Math.round(score * 100) / 100;
-    return individual;
-  }
+  private depthSerach(matches, days) {
+    let success = false;
+    let depth = this.allPosibleMatches;
+    let opened;
 
+    for (let i = 0; i < days.length; i++) {
+      opened = days[i];
+    }
+    
+
+    while (success || opened === null) {
+      opened = null;
+      if (opened < depth) {
+        success = false;
+      }
+      
+    }
+  }
   /**
    * @name ruleOne
    * @description This rule verify that the matches are in the same time
@@ -205,11 +153,7 @@ export class Schedules {
    * @param court 
    * @returns scoreRuleOne
    */
-  private ruleOne(courts, gMatch, hour, court): number {
-    let scoreRuleOne = 0;
-    if (!gMatch) {
-      return 0;
-    }
+  private ruleOne(courts, gMatch, hour, court): boolean {
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
 
     for (let i = 0; i < courts.length; i++) {
@@ -219,11 +163,11 @@ export class Schedules {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
         if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[0]
           || teamsMatchToEvaluate[0] === teamsMatch[1] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          scoreRuleOne++;
+            return false;
         }
       }
     }
-    return scoreRuleOne;
+    return true;
 
   }
   /**
@@ -233,12 +177,9 @@ export class Schedules {
    * @param hour 
    * @description Validate one team can not play more than three times in a day. 
    */
-  private ruleTwo(hours, gMatch): number {
-    let scoreRuleTwo = 0;
+  private ruleTwo(hours, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    if (!gMatch) {
-      return 0;
-    }
+    
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
     for (let i = 0; i < hours.length; i++) {
       if (!hours[i].matchId) {
@@ -254,9 +195,9 @@ export class Schedules {
       }
     }
     if (teamOne >= 3 || teamTwo >= 3) {
-      scoreRuleTwo += 0.2;
+      return false;
     }
-    return scoreRuleTwo;
+    return true;
   }
   /**
    * @name ruleThree
@@ -265,12 +206,9 @@ export class Schedules {
    * @param hour 
    * @description One team can not wait more than two matches to play again.
    */
-  private ruleThree(hours, gMatch): number {
-    let scoreRuleThree = 0;
+  private ruleThree(hours, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    if (!gMatch) {
-      return 0;
-    }
+  
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
     for (let i = 0; i < hours.length; i++) {
       if (!hours[i].matchId) {
@@ -292,31 +230,9 @@ export class Schedules {
       }
     }
     if (teamOne >= 2 || teamTwo >= 2) {
-      scoreRuleThree += 0.2;
+      return false;
     }
-    return scoreRuleThree;
-  }
-  /**
-   * @name ruleFour
-   * @description There are not empty spaces
-   * @param matchId 
-   * @returns score
-   */
-  private ruleFour(nDays, hours): number {
-    let scoreRuleFour = 0;
-    for (let i = 0; i < nDays; i++) {
-      let scoreProd = 1 + i;
-      let spaceCounter = 0;
-      for (let j = 0; j < hours.length; j++ ){
-        if (!hours[j].matchId) {
-          scoreRuleFour += ++spaceCounter * scoreProd;
-        } else {
-          spaceCounter = 0;
-        }
-      }
-
-    }
-    return (scoreRuleFour/1000);
+    return true;
   }
   /**
    * @name getTeamsFromMatch
