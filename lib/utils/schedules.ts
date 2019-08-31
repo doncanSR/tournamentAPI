@@ -17,8 +17,9 @@ export class Schedules {
   days: string[] = [];
   matchesPerDay: number;
   allPosibleMatches: number;
-  matchesCreated: any;
+  matchesCreated: any = [];
   maxGroup: any;
+  asiggnedMatches: any;
 
   constructor(tournamenId: string) {
     this.tournamentId = tournamenId;
@@ -41,7 +42,16 @@ export class Schedules {
       allDays.push(dToSave.toISOString());
     }
     this.days = allDays;
-    this.matchesCreated = await Match.find({ 'tournamentID': this.tournamentId });
+    let matches = await Match.find({ 'tournamentID': this.tournamentId });
+    for (const match of matches) {
+      let m = {
+        id: match._id.toString(),
+        historicId: 0,
+        teamOne: match.teamOne,
+        teamTwo: match.teamTwo
+      }
+      this.matchesCreated.push(m)
+    }
     this.courts = await Court.find({}).sort({ 'availability': -1 });
     this.maxGroup = await Group.aggregate([
       { $unwind: "$teamID" },
@@ -120,24 +130,40 @@ export class Schedules {
   }
   private scheduler() {
     let days = this.createDays();
-    for (const day of days) {
-      console.log('day: ', day);
-      this.flowTreeSchedule(day);
+    let historicMatch = [];
+    let matchToEvaluate = {};
+    //this match should be evaluted 
+    matchToEvaluate = this.searchMatch();
+    historicMatch.push(matchToEvaluate);
+    //if approved
+    for (const courts of days) {
+      for (const [c, court] of courts.entries()) {
+        for (const [h, hour] of court.hours.entries()) {
+          console.log('hour: ', hour.hours, 'MatchId: ', hour.matchId);
+          this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)
+            ? console.log('Valid')
+            : console.log('Not valid')
+
+        }
+      }
+
     }
+
   }
-  private flowTreeMatches() {
+
+  private searchMatch() {
+
     for (const match of this.matchesCreated) {
-      console.log('Match: ', match);
-    }
-  }
-  private flowTreeSchedule(day) {
-    for (const court of day) {
-      console.log('Court: ', court);
-      for (const hour of court.hours) {
-        console.log(hour);
+      if (match.historicId === +1) {
+        match.historicId = 0
+        continue;
+      }
+      if (match.historicId === 0) {
+        return match;
       }
     }
   }
+
   /**
    * @name ruleOne
    * @description This rule verify that the matches are in the same time
@@ -148,15 +174,15 @@ export class Schedules {
    * @returns scoreRuleOne
    */
   private ruleOne(courts, gMatch, hour, court): boolean {
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
+    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch.id);
 
     for (let i = 0; i < courts.length; i++) {
       if (!courts[i].hours[hour]) {
         continue;
       } else if (i !== court) {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[0]
-          || teamsMatchToEvaluate[0] === teamsMatch[1] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
+        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamTwo === teamsMatch[0]
+          || gMatch.teamOne === teamsMatch[1] || gMatch.teamTwo === teamsMatch[1]) {
           return false;
         }
       }
@@ -169,7 +195,7 @@ export class Schedules {
    * @param hours 
    * @param gMatch 
    * @param hour 
-   * @description Validate one team can not play more than three times in a day. 
+   * @description Validate one team can not play more than four times in a day. 
    */
   private ruleTwo(hours, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
@@ -188,46 +214,12 @@ export class Schedules {
         }
       }
     }
-    if (teamOne >= 3 || teamTwo >= 3) {
+    if (teamOne >= 4 || teamTwo >= 4) {
       return false;
     }
     return true;
   }
-  /**
-   * @name ruleThree
-   * @param hours 
-   * @param gMatch 
-   * @param hour 
-   * @description One team can not wait more than two matches to play again.
-   */
-  private ruleThree(hours, gMatch): boolean {
-    let teamOne = 0, teamTwo = 0;
 
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        teamOne++;
-        teamTwo++;
-        continue;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
-          teamOne = 0;
-        } else {
-          teamOne++;
-        }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          teamTwo = 0;
-        } else {
-          teamTwo++;
-        }
-      }
-    }
-    if (teamOne >= 2 || teamTwo >= 2) {
-      return false;
-    }
-    return true;
-  }
   /**
    * @name getTeamsFromMatch
    * @description Get the teams from a match
@@ -240,7 +232,7 @@ export class Schedules {
       return teams;
     }
     for (const match of this.matchesCreated) {
-      if (match._id.toString() === matchId) {
+      if (match.id === matchId) {
         teams.push(match.teamOne);
         teams.push(match.teamTwo);
       }
