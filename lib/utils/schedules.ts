@@ -88,9 +88,8 @@ export class Schedules {
   public async scheduleInit() {
 
     await this.getTournamentInfo();
-    let matches = await Match.find({});
-    let days = this.createDays();
-    
+    this.scheduler();
+
   }
   /**
    * createDays
@@ -119,29 +118,24 @@ export class Schedules {
     }
     return days;
   }
-
-  /**
-   * 
-   * @param Matches 
-   * @param Days 
-   * @returns a schedule per day
-   */
-  private depthSerach(matches, days) {
-    let success = false;
-    let depth = this.allPosibleMatches;
-    let opened;
-
-    for (let i = 0; i < days.length; i++) {
-      opened = days[i];
+  private scheduler() {
+    let days = this.createDays();
+    for (const day of days) {
+      console.log('day: ', day);
+      this.flowTreeSchedule(day);
     }
-    
-
-    while (success || opened === null) {
-      opened = null;
-      if (opened < depth) {
-        success = false;
+  }
+  private flowTreeMatches() {
+    for (const match of this.matchesCreated) {
+      console.log('Match: ', match);
+    }
+  }
+  private flowTreeSchedule(day) {
+    for (const court of day) {
+      console.log('Court: ', court);
+      for (const hour of court.hours) {
+        console.log(hour);
       }
-      
     }
   }
   /**
@@ -163,7 +157,7 @@ export class Schedules {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
         if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[0]
           || teamsMatchToEvaluate[0] === teamsMatch[1] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-            return false;
+          return false;
         }
       }
     }
@@ -179,7 +173,7 @@ export class Schedules {
    */
   private ruleTwo(hours, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    
+
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
     for (let i = 0; i < hours.length; i++) {
       if (!hours[i].matchId) {
@@ -208,7 +202,7 @@ export class Schedules {
    */
   private ruleThree(hours, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-  
+
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
     for (let i = 0; i < hours.length; i++) {
       if (!hours[i].matchId) {
