@@ -130,36 +130,49 @@ export class Schedules {
   }
   private scheduler() {
     let days = this.createDays();
-    let historicMatch = [];
-    let matchToEvaluate = {};
+    let matchToEvaluate = {
+      id: '',
+      historicId: 0
+    };
+    let historyIdSuccess = 0;
     //this match should be evaluted 
-    matchToEvaluate = this.searchMatch();
-    historicMatch.push(matchToEvaluate);
+    matchToEvaluate = this.searchMatchFirstAvailable();
     //if approved
     for (const courts of days) {
       for (const [c, court] of courts.entries()) {
         for (const [h, hour] of court.hours.entries()) {
           console.log('hour: ', hour.hours, 'MatchId: ', hour.matchId);
-          this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)
-            ? console.log('Valid')
-            : console.log('Not valid')
-
+          if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
+            hour.matchId = matchToEvaluate.id;
+            matchToEvaluate.historicId = ++historyIdSuccess;
+            this.updateHistoryId(matchToEvaluate);
+            this.searchForPending();
+          } else {
+            console.log('Not valid');
+          }
         }
       }
-
     }
-
   }
 
-  private searchMatch() {
-
+  private searchMatchFirstAvailable() {
     for (const match of this.matchesCreated) {
-      if (match.historicId === +1) {
-        match.historicId = 0
-        continue;
-      }
       if (match.historicId === 0) {
         return match;
+      }
+    }
+  }
+  private updateHistoryId(m) {
+    for (const match of this.matchesCreated) {
+      if (match.id === m.id) {
+        match.historicId = m.historicId
+      }
+    }
+  }
+  private searchForPending() {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === -1) {
+        match.historicId = 0
       }
     }
   }
