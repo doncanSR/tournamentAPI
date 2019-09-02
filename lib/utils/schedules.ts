@@ -135,26 +135,28 @@ export class Schedules {
       historicId: 0
     };
     let historyIdSuccess = 0;
-    //this match should be evaluted 
-    matchToEvaluate = this.searchMatchFirstAvailable();
-    //if approved
     for (const courts of days) {
       for (const [c, court] of courts.entries()) {
         for (const [h, hour] of court.hours.entries()) {
-          console.log('hour: ', hour.hours, 'MatchId: ', hour.matchId);
+          this.searchForPending();
+          matchToEvaluate = this.searchMatchFirstAvailable();
           if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
             hour.matchId = matchToEvaluate.id;
             matchToEvaluate.historicId = ++historyIdSuccess;
             this.updateHistoryId(matchToEvaluate);
-            this.searchForPending();
           } else {
-            console.log('Not valid');
+            matchToEvaluate.historicId = -1;
+            this.updateHistoryId(matchToEvaluate);
           }
         }
       }
     }
   }
-
+  /**
+   * @name searchMatchFirstAvailable
+   * @description this method look for the firts match avaiblable
+   * @returns the first match avaiblable
+   */
   private searchMatchFirstAvailable() {
     for (const match of this.matchesCreated) {
       if (match.historicId === 0) {
@@ -162,6 +164,10 @@ export class Schedules {
       }
     }
   }
+  /**
+  * @name updateHistoryId
+  * @description this method update the history id, depending of it is valid isn't it
+  */
   private updateHistoryId(m) {
     for (const match of this.matchesCreated) {
       if (match.id === m.id) {
@@ -169,6 +175,11 @@ export class Schedules {
       }
     }
   }
+  /**
+   * @name searchForPending
+   * @description this method makes available all the pendings matches
+   * @returns the first match avaiblable
+   */
   private searchForPending() {
     for (const match of this.matchesCreated) {
       if (match.historicId === -1) {
