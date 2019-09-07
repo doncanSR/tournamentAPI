@@ -135,22 +135,26 @@ export class Schedules {
       historicId: 0
     };
     let historyIdSuccess = 0;
-    for (const courts of days) {
-      for (const [c, court] of courts.entries()) {
-        for (const [h, hour] of court.hours.entries()) {
+    for (const courts of days) { //days
+      for (const [c, court] of courts.entries()) { // courts
+        for (const [h, hour] of court.hours.entries()) { // hours 
           this.searchForPending();
           matchToEvaluate = this.searchMatchFirstAvailable();
           if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
             hour.matchId = matchToEvaluate.id;
             matchToEvaluate.historicId = ++historyIdSuccess;
             this.updateHistoryId(matchToEvaluate);
+            console.log('Success ==> ', this.matchesCreated);            
+            console.log('This is days ==> ', days);
           } else {
             matchToEvaluate.historicId = -1;
             this.updateHistoryId(matchToEvaluate);
+            console.log('Fail ==> ', this.matchesCreated);            
           }
         }
       }
     }
+    
   }
   /**
    * @name searchMatchFirstAvailable
