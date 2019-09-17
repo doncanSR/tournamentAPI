@@ -135,7 +135,7 @@ export class Schedules {
       historicId: 0
     };
     let historyIdSuccess = 0;
-    for (const courts of days) { //days
+    for (const [d, courts] of days.entries()) { //days
       for (const [c, court] of courts.entries()) { // courts
         for (const [h, hour] of court.hours.entries()) { // hours 
           this.searchForPending();
@@ -146,6 +146,7 @@ export class Schedules {
             this.updateHistoryId(matchToEvaluate);
             console.log('Success ==> ', this.matchesCreated);            
             console.log('This is days ==> ', days);
+            this.matchUpdate(matchToEvaluate, hour.hours, d, court.id)
           } else {
             matchToEvaluate.historicId = -1;
             this.updateHistoryId(matchToEvaluate);
@@ -273,13 +274,19 @@ export class Schedules {
    * @param hour
    * @description it should update the match with its time and court
    */
-  private async matchUpdate(match, hour, day) {
-    let matchToUpdate = match;
+  private async matchUpdate(match, hour, day, court) {
+    let matchToUpdate = { 
+      id: match.id,
+      dateMatch: null,
+      court: court
+    };
     let dateMatch = new Date(Date.parse(this.days[day]));
-    dateMatch.setHours(parseInt(hour[0]));
-    match.dateMatch = dateMatch;
-    // let correct = await this.fourRules(match);
-    console.log('this is the match ==> ', match);
+    dateMatch.setHours(parseInt(hour));
+    dateMatch.setMinutes(0);
+    dateMatch.setSeconds(0)
+    matchToUpdate.dateMatch = dateMatch;
+    console.log('this is the match ==> ', matchToUpdate);
+    await Match.findOneAndUpdate({ _id: matchToUpdate.id }, matchToUpdate, { new: true });
   }
 
 }
