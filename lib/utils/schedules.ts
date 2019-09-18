@@ -98,8 +98,8 @@ export class Schedules {
   public async scheduleInit() {
 
     await this.getTournamentInfo();
-    this.scheduler();
-
+    let days = this.scheduler();// this.scheduler();
+    this.printSchedule(days);
   }
   /**
    * createDays
@@ -128,6 +128,12 @@ export class Schedules {
     }
     return days;
   }
+
+    /**
+   * scheduler
+   * @Description Create the schedule
+   * @returns days if the schedule is good, null if not
+   */
   private scheduler() {
     let days = this.createDays();
     let matchToEvaluate = {
@@ -140,16 +146,23 @@ export class Schedules {
         for (const [h, hour] of court.hours.entries()) { // hours 
           this.searchForPending();
           matchToEvaluate = this.searchMatchFirstAvailable();
-          if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
-            hour.matchId = matchToEvaluate.id;
-            matchToEvaluate.historicId = ++historyIdSuccess;
-            this.updateHistoryId(matchToEvaluate);
-            console.log('Success ==> ', this.matchesCreated);            
-            console.log('This is days ==> ', days);
-          } else {
-            matchToEvaluate.historicId = -1;
-            this.updateHistoryId(matchToEvaluate);
-            console.log('Fail ==> ', this.matchesCreated);            
+          if(matchToEvaluate){
+            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
+              hour.matchId = matchToEvaluate.id;
+              matchToEvaluate.historicId = ++historyIdSuccess;
+              this.updateHistoryId(matchToEvaluate);
+              //console.log('Success ==> ', this.matchesCreated);            
+              //console.log('This is days ==> ', days);
+            } else {
+              matchToEvaluate.historicId = -1;
+              this.updateHistoryId(matchToEvaluate);
+              //console.log('Fail ==> ', this.matchesCreated);            
+            }
+          }else if(this.searchPendingMatches()){
+            this.searchForPending();
+            continue;
+          }else{
+            return days;
           }
         }
       }
@@ -167,10 +180,24 @@ export class Schedules {
         return match;
       }
     }
+    return null;
+  }
+    /**
+   * @name searchPendingMatches
+   * @description this method look for the matches who are pending
+   * @returns true if there are any match pending, if not false
+   */
+  private searchPendingMatches():boolean{
+    for (const match of this.matchesCreated){
+      if(match.historicId === -1){
+        return true;
+      }
+    }
+    return false;
   }
   /**
   * @name updateHistoryId
-  * @description this method update the history id, depending of it is valid isn't it
+  * @description this method update the history id, depending of it is valid or isn't it
   */
   private updateHistoryId(m) {
     for (const match of this.matchesCreated) {
@@ -280,6 +307,12 @@ export class Schedules {
     match.dateMatch = dateMatch;
     // let correct = await this.fourRules(match);
     console.log('this is the match ==> ', match);
+  }
+
+  private printSchedule(days){
+
+    console.log(days);
+        
   }
 
 }
