@@ -129,11 +129,11 @@ export class Schedules {
     return days;
   }
 
-    /**
-   * scheduler
-   * @Description Create the schedule
-   * @returns days if the schedule is good, null if not
-   */
+  /**
+ * scheduler
+ * @Description Create the schedule
+ * @returns days if the schedule is good, null if not
+ */
   private scheduler() {
     let days = this.createDays();
     let matchToEvaluate = {
@@ -144,30 +144,35 @@ export class Schedules {
     for (const courts of days) { //days
       for (const [c, court] of courts.entries()) { // courts
         for (const [h, hour] of court.hours.entries()) { // hours 
-          this.searchForPending();
           matchToEvaluate = this.searchMatchFirstAvailable();
-          if(matchToEvaluate){
-            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
+          while (matchToEvaluate) {
+            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate) &&
+              this.ruleThree(court.hours, matchToEvaluate)) {
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
               this.updateHistoryId(matchToEvaluate);
-              //console.log('Success ==> ', this.matchesCreated);            
-              //console.log('This is days ==> ', days);
+              this.searchForPending();
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              break;
+              console.log('Success ==> ', this.matchesCreated);
+              console.log('This is days ==> ', days);
             } else {
               matchToEvaluate.historicId = -1;
               this.updateHistoryId(matchToEvaluate);
+              matchToEvaluate = this.searchMatchFirstAvailable();
               //console.log('Fail ==> ', this.matchesCreated);            
             }
-          }else if(this.searchPendingMatches()){
+          }
+          if (!matchToEvaluate && this.searchPendingMatches()) {
             this.searchForPending();
             continue;
-          }else{
+          } else if(!matchToEvaluate){
             return days;
           }
         }
       }
     }
-    
+
   }
   /**
    * @name searchMatchFirstAvailable
@@ -182,14 +187,14 @@ export class Schedules {
     }
     return null;
   }
-    /**
-   * @name searchPendingMatches
-   * @description this method look for the matches who are pending
-   * @returns true if there are any match pending, if not false
-   */
-  private searchPendingMatches():boolean{
-    for (const match of this.matchesCreated){
-      if(match.historicId === -1){
+  /**
+ * @name searchPendingMatches
+ * @description this method look for the matches who are pending
+ * @returns true if there are any match pending, if not false
+ */
+  private searchPendingMatches(): boolean {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === -1) {
         return true;
       }
     }
@@ -226,7 +231,7 @@ export class Schedules {
    * @param gMatch 
    * @param hour 
    * @param court 
-   * @returns scoreRuleOne
+   * @returns true if the rule is done or false if not
    */
   private ruleOne(courts, gMatch, hour, court): boolean {
     let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch.id);
@@ -250,6 +255,7 @@ export class Schedules {
    * @param hours 
    * @param gMatch 
    * @param hour 
+   * @returns true if the rule is done or false if not
    * @description Validate one team can not play more than four times in a day. 
    */
   private ruleTwo(hours, gMatch): boolean {
@@ -271,6 +277,36 @@ export class Schedules {
     }
     if (teamOne >= 4 || teamTwo >= 4) {
       return false;
+    }
+    return true;
+  }
+
+  /**
+   * @name ruleThree
+   * @param hours 
+   * @param gMatch 
+   * @param hour 
+   * @returns true if the rule is done or false if not
+   * @description Validate one team can not play more than four times in a day. 
+   */
+  private ruleThree(hours, gMatch): boolean {
+    let teamOne = 0, teamTwo = 0;
+    let teamsMatchToEvaluate = [gMatch.teamOne,gMatch.teamTwo];
+    for (let i = 0; i < hours.length; i++) {
+      if (!hours[i].matchId) {
+        continue;
+      } else {
+        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
+        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
+          teamOne++;
+        } else { teamOne = 0; }
+        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
+          teamTwo++;
+        } else { teamTwo = 0; }
+      }
+      if (teamOne > 1 || teamTwo > 1) {
+        return false;
+      }
     }
     return true;
   }
@@ -309,10 +345,10 @@ export class Schedules {
     console.log('this is the match ==> ', match);
   }
 
-  private printSchedule(days){
+  private printSchedule(days) {
 
     console.log(days);
-        
+
   }
 
 }
