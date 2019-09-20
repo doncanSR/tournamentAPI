@@ -146,8 +146,8 @@ export class Schedules {
         for (const [h, hour] of court.hours.entries()) { // hours 
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
-            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate) &&
-              this.ruleThree(court.hours, matchToEvaluate)) {
+            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
+              this.ruleThree(courts, matchToEvaluate)) {
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
               this.updateHistoryId(matchToEvaluate);
@@ -160,13 +160,13 @@ export class Schedules {
               matchToEvaluate.historicId = -1;
               this.updateHistoryId(matchToEvaluate);
               matchToEvaluate = this.searchMatchFirstAvailable();
-              //console.log('Fail ==> ', this.matchesCreated);            
+              //console.log('Fail ==> ', this.matchesCreated);
             }
           }
           if (!matchToEvaluate && this.searchPendingMatches()) {
             this.searchForPending();
             continue;
-          } else if(!matchToEvaluate){
+          } else if (!matchToEvaluate) {
             return days;
           }
         }
@@ -234,7 +234,6 @@ export class Schedules {
    * @returns true if the rule is done or false if not
    */
   private ruleOne(courts, gMatch, hour, court): boolean {
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch.id);
 
     for (let i = 0; i < courts.length; i++) {
       if (!courts[i].hours[hour]) {
@@ -258,20 +257,20 @@ export class Schedules {
    * @returns true if the rule is done or false if not
    * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleTwo(hours, gMatch): boolean {
+  private ruleTwo(courts, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        continue;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
-          teamOne++;
-        }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          teamTwo++;
+    for (let j = 0; j < courts.length; j++) {
+      for (let i = 0; i < courts[j].hours.length; i++) {
+        if (!courts[j].hours[i].matchId) {
+          continue;
+        } else {
+          let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+          if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
+            teamOne++;
+          }
+          if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
+            teamTwo++;
+          }
         }
       }
     }
@@ -289,24 +288,66 @@ export class Schedules {
    * @returns true if the rule is done or false if not
    * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleThree(hours, gMatch): boolean {
+  private ruleThree(courts, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    let teamsMatchToEvaluate = [gMatch.teamOne,gMatch.teamTwo];
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        continue;
+    let j = 0, i = 0;
+    /*while (j < courts.length && i < courts[j].hours.length) {
+
+      if (courts[j] && !courts[j].hours[i].matchId) {
+        j++;
+      } else if (!courts[j]) {
+        i++;
+        j=0;
       } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
+        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
           teamOne++;
         } else { teamOne = 0; }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
+        if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
           teamTwo++;
         } else { teamTwo = 0; }
       }
-      if (teamOne > 1 || teamTwo > 1) {
-        return false;
+    }*/
+    while (courts[j] && courts[j].hours[i]) {
+      while (courts[j]) {
+        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
+          teamOne++;
+          i++;
+          j=0;
+        } else if (!courts[++j]) {
+          teamOne = 0;
+        }else{
+          j++;
+          i = 0;
+        }
       }
+      j = 0;
+      i++;
+    }
+
+    j = 0, i = 0;
+    
+    while (courts[j] && courts[j].hours[i]) {
+      while (courts[j]) {
+        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+        if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
+          teamTwo++;
+          i++;
+          j = 0;
+        } else if (!courts[++j]) {
+          teamTwo = 0;
+        }else{
+          j++;
+          i = 0;
+        }
+      }
+      j = 0;
+      i++;
+    }
+
+    if (teamOne > 1 || teamTwo > 1) {
+      return false;
     }
     return true;
   }
