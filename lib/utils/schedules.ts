@@ -290,66 +290,35 @@ export class Schedules {
    */
   private ruleThree(courts, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    let j = 0, i = 0;
-    /*while (j < courts.length && i < courts[j].hours.length) {
-
-      if (courts[j] && !courts[j].hours[i].matchId) {
-        j++;
-      } else if (!courts[j]) {
-        i++;
-        j=0;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
-          teamOne++;
-        } else { teamOne = 0; }
-        if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
-          teamTwo++;
-        } else { teamTwo = 0; }
-      }
-    }*/
-    while (courts[j] && courts[j].hours[i]) {
-      while (courts[j]) {
-        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
-          teamOne++;
-          i++;
-          j=0;
-        } else if (!courts[++j]) {
-          teamOne = 0;
-        }else{
-          j++;
-          i = 0;
-        }
-      }
-      j = 0;
-      i++;
-    }
-
-    j = 0, i = 0;
-    
-    while (courts[j] && courts[j].hours[i]) {
-      while (courts[j]) {
-        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-        if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
-          teamTwo++;
-          i++;
-          j = 0;
-        } else if (!courts[++j]) {
-          teamTwo = 0;
-        }else{
-          j++;
-          i = 0;
-        }
-      }
-      j = 0;
-      i++;
-    }
-
+    teamOne = this.countTimes(courts, gMatch.teamOne);
+    teamTwo = this.countTimes(courts, gMatch.teamTwo);
     if (teamOne > 1 || teamTwo > 1) {
       return false;
     }
     return true;
+  }
+
+  private countTimes(courts, teamId){
+    let i,j;
+    let counterTeam;
+    while (j < courts.length && i < courts[j].hours.length) {
+      while (j < courts.length) {
+        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+        if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+          counterTeam++;
+          i++;
+          j = 0;
+        } else if (!courts[++j]) {
+          counterTeam = 0;
+        }else{
+          j++;
+          i = 0;
+        }
+      }
+      j = 0;
+      i++;
+    }
+    return counterTeam;
   }
 
   /**
