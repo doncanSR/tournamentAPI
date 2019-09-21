@@ -140,22 +140,22 @@ export class Schedules {
         for (const [h, hour] of court.hours.entries()) { // hours 
           this.searchForPending();
           matchToEvaluate = this.searchMatchFirstAvailable();
-          if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate)) {
+          if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate) && this.ruleThree(courts, matchToEvaluate)) {
             hour.matchId = matchToEvaluate.id;
             matchToEvaluate.historicId = ++historyIdSuccess;
             this.updateHistoryId(matchToEvaluate);
-            console.log('Success ==> ', this.matchesCreated);            
+            console.log('Success ==> ', this.matchesCreated);
             console.log('This is days ==> ', days);
-            this.matchUpdate(matchToEvaluate, hour.hours, d, court.id)
+            // this.matchUpdate(matchToEvaluate, hour.hours, d, court.id)
           } else {
             matchToEvaluate.historicId = -1;
             this.updateHistoryId(matchToEvaluate);
-            console.log('Fail ==> ', this.matchesCreated);            
+            console.log('Fail ==> ', this.matchesCreated);
           }
         }
       }
     }
-    
+
   }
   /**
    * @name searchMatchFirstAvailable
@@ -203,7 +203,6 @@ export class Schedules {
    * @returns scoreRuleOne
    */
   private ruleOne(courts, gMatch, hour, court): boolean {
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch.id);
 
     for (let i = 0; i < courts.length; i++) {
       if (!courts[i].hours[hour]) {
@@ -248,7 +247,31 @@ export class Schedules {
     }
     return true;
   }
+  private ruleThree(courts, gMatch) {
+    let matchToFind = gMatch.id;
+    let getY, getX, counterX = 0;
+    function getTeams(hour) {
+      let teams = this.getTeamsFromMatch(hour.matchId)
+      if (teams[0] === matchToFind.teamOne || teams[1] === matchToFind.teamTwo ||
+        teams[1] === matchToFind.teamOne || teams[0] === matchToFind.teamTwo) {
+          counterX !== 0 ? counterX = 0 : counterX = parseInt(hour.hours) - counterX
+          if (counterX === 1) {
+            return true;
+          }
+      }
+    }
+    courts.forEach((court, index) => {
+      getY = court
+      getX = getY.hours.filter(getTeams);
+      if (getX.length > 1) {
 
+      }
+      console.log(getX);
+    });
+
+
+    return true;
+  }
   /**
    * @name getTeamsFromMatch
    * @description Get the teams from a match
@@ -275,16 +298,16 @@ export class Schedules {
    * @description it should update the match with its time and court
    */
   private async matchUpdate(match, hour, day, court) {
-    let matchToUpdate = { 
+    let matchToUpdate = {
       id: match.id,
       dateMatch: null,
-      court: court
+      court: null
     };
     let dateMatch = new Date(Date.parse(this.days[day]));
     dateMatch.setHours(parseInt(hour));
     dateMatch.setMinutes(0);
     dateMatch.setSeconds(0)
-    matchToUpdate.dateMatch = dateMatch;
+    // matchToUpdate.dateMatch = dateMatch;
     console.log('this is the match ==> ', matchToUpdate);
     await Match.findOneAndUpdate({ _id: matchToUpdate.id }, matchToUpdate, { new: true });
   }
