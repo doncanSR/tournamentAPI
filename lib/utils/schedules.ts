@@ -153,15 +153,9 @@ export class Schedules {
               this.updateHistoryId(matchToEvaluate);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
-<<<<<<< HEAD
-              this.matchUpdate(matchToEvaluate, hour.hours, d, courts[c].id) 
-              break;
-
-=======
               break;
               console.log('Success ==> ', this.matchesCreated);
               console.log('This is days ==> ', days);
->>>>>>> 34ece87d12e463e4a1203823048c50a9a2dd6ffe
             } else {
               matchToEvaluate.historicId = -1;
               this.updateHistoryId(matchToEvaluate);
