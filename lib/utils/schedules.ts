@@ -135,22 +135,34 @@ export class Schedules {
       historicId: 0
     };
     let historyIdSuccess = 0;
-    for (const [d, courts] of days.entries()) { //days
+    for (const courts of days) { //days
       for (const [c, court] of courts.entries()) { // courts
         for (const [h, hour] of court.hours.entries()) { // hours 
-          this.searchForPending();
           matchToEvaluate = this.searchMatchFirstAvailable();
-          if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(court.hours, matchToEvaluate) && this.ruleThree(courts, matchToEvaluate)) {
-            hour.matchId = matchToEvaluate.id;
-            matchToEvaluate.historicId = ++historyIdSuccess;
-            this.updateHistoryId(matchToEvaluate);
-            console.log('Success ==> ', this.matchesCreated);
-            console.log('This is days ==> ', days);
-            // this.matchUpdate(matchToEvaluate, hour.hours, d, court.id)
-          } else {
-            matchToEvaluate.historicId = -1;
-            this.updateHistoryId(matchToEvaluate);
-            console.log('Fail ==> ', this.matchesCreated);
+          while (matchToEvaluate) {
+            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
+              this.ruleThree(courts, matchToEvaluate)) {
+              hour.matchId = matchToEvaluate.id;
+              matchToEvaluate.historicId = ++historyIdSuccess;
+              this.updateHistoryId(matchToEvaluate);
+              this.searchForPending();
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              console.log('Success ==> ', this.matchesCreated);
+              console.log('This is days ==> ', days);
+              break;
+
+            } else {
+              matchToEvaluate.historicId = -1;
+              this.updateHistoryId(matchToEvaluate);
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              //console.log('Fail ==> ', this.matchesCreated);
+            }
+          }
+          if (!matchToEvaluate && this.searchPendingMatches()) {
+            this.searchForPending();
+            continue;
+          } else if (!matchToEvaluate) {
+            return days;
           }
         }
       }
@@ -168,6 +180,20 @@ export class Schedules {
         return match;
       }
     }
+  }
+
+  /**
+* @name searchPendingMatches
+* @description this method look for the matches who are pending
+* @returns true if there are any match pending, if not false
+*/
+  private searchPendingMatches(): boolean {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === -1) {
+        return true;
+      }
+    }
+    return false;
   }
   /**
   * @name updateHistoryId
@@ -247,29 +273,35 @@ export class Schedules {
     }
     return true;
   }
-  private ruleThree(courts, gMatch) {
-    let matchToFind = gMatch.id;
-    let getY, getX, counterX = 0;
-    function getTeams(hour) {
-      let teams = this.getTeamsFromMatch(hour.matchId)
-      if (teams[0] === matchToFind.teamOne || teams[1] === matchToFind.teamTwo ||
-        teams[1] === matchToFind.teamOne || teams[0] === matchToFind.teamTwo) {
-          counterX !== 0 ? counterX = 0 : counterX = parseInt(hour.hours) - counterX
-          if (counterX === 1) {
-            return true;
+
+  private countTimes(courts, teamId) {
+    let court = 0;
+    let counter = 0;
+    while (court < courts.length) {
+      courts[court].hours.forEach(hour => {
+        if (hour && hour.matchId && hour.matchId !== "") {
+          let teamsMatch = this.getTeamsFromMatch(hour.matchId);
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+           counter++;
+          }else{
+            counter = 0;
           }
-      }
+        }
+      });
+      console.log(counter)
+      court++;
     }
-    courts.forEach((court, index) => {
-      getY = court
-      getX = getY.hours.filter(getTeams);
-      if (getX.length > 1) {
+    return counter;
+  }
+  private ruleThree(courts, gMatch) {
+    let teamOne = 0, teamTwo = 0;
 
-      }
-      console.log(getX);
-    });
+    teamOne = this.countTimes(courts, gMatch.teamOne);
+    teamTwo = this.countTimes(courts, gMatch.teamTwo);
 
-
+    if (teamOne >= 2 || teamTwo >= 2) {
+      return false;
+    }
     return true;
   }
   /**
