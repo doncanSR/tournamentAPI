@@ -294,35 +294,6 @@ export class Schedules {
     return true;
   }
 
-  private countTimes(courts, teamId) {
-    let court = 0;
-    let counter = 0;
-    while (court < courts.length) {
-      courts[court].hours.forEach(hour => {
-        if (hour && hour.matchId && hour.matchId !== "") {
-          let teamsMatch = this.getTeamsFromMatch(hour.matchId);
-          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
-           counter++;
-          }else{
-            counter = 0;
-          }
-        }
-      });
-      court++;
-    }
-    return counter;
-  }
-  private ruleThree(courts, gMatch) {
-    let teamOne = 0, teamTwo = 0;
-
-    teamOne = this.countTimes(courts, gMatch.teamOne);
-    teamTwo = this.countTimes(courts, gMatch.teamTwo);
-
-    if (teamOne >= 2 || teamTwo >= 2) {
-      return false;
-    }
-    return true;
-  }
   /**
    * @name ruleThree
    * @param hours 
