@@ -147,7 +147,7 @@ export class Schedules {
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
-              this.ruleThree(courts, matchToEvaluate)) {
+              this.ruleThree(courts, matchToEvaluate, h)) {
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
               this.updateHistoryId(matchToEvaluate);
@@ -186,19 +186,6 @@ export class Schedules {
       }
     }
     return null;
-  }
-  /**
- * @name searchPendingMatches
- * @description this method look for the matches who are pending
- * @returns true if there are any match pending, if not false
- */
-  private searchPendingMatches(): boolean {
-    for (const match of this.matchesCreated) {
-      if (match.historicId === -1) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -302,37 +289,51 @@ export class Schedules {
    * @returns true if the rule is done or false if not
    * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleThree(courts, gMatch): boolean {
-    let teamOne = 0, teamTwo = 0;
-    teamOne = this.countTimes(courts, gMatch.teamOne);
-    teamTwo = this.countTimes(courts, gMatch.teamTwo);
-    if (teamOne > 1 || teamTwo > 1) {
-      return false;
+  private ruleThree(courts, gMatch, y): boolean {
+    let teamOne = true, teamTwo = true;
+    let times = 2;
+    teamOne = this.countTimesDown(courts, gMatch.teamOne, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamOne, y, y - times, true);
+    teamTwo = this.countTimesDown(courts, gMatch.teamTwo, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamTwo, y, y - times, true);
+    if (teamOne && teamTwo) {
+      return true;
     }
-    return true;
+    return false;
   }
 
-  private countTimes(courts, teamId){
-    let i,j;
-    let counterTeam;
-    while (j < courts.length && i < courts[j].hours.length) {
-      while (j < courts.length) {
-        let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-        if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
-          counterTeam++;
-          i++;
-          j = 0;
-        } else if (!courts[++j]) {
-          counterTeam = 0;
-        }else{
-          j++;
-          i = 0;
+  private countTimesDown(courts, teamId, h, times, aux) {
+
+    if (h < times) { 
+      courts.forEach(court => {
+        if (court.hours[h + 1] && court.hours[h + 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h + 1].matchId);
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+            aux = this.countTimesDown(courts, teamId, h + 1, times, aux);
+          }
         }
-      }
-      j = 0;
-      i++;
+      });
+    }else{
+      return false;
     }
-    return counterTeam;
+    return aux;
+  }
+
+  private countTimesUp(courts, teamId, h, times, aux) {
+
+    if (times < h) { 
+      courts.forEach(court => {
+        if (court.hours[h - 1] && court.hours[h - 1].matchId && court.hours[h - 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h - 1].matchId);
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+            aux = this.countTimesUp(courts, teamId, h - 1, times, aux);
+          }
+        }
+      });
+    }else{
+      return false;
+    }
+    return aux;
   }
 
   /**
@@ -379,7 +380,7 @@ export class Schedules {
 
   private printSchedule(days) {
 
-    console.log(days);
+    console.log(this.matchesCreated);
 
   }
 
