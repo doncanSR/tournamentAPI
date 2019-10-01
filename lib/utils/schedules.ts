@@ -48,7 +48,8 @@ export class Schedules {
         id: match._id.toString(),
         historicId: 0,
         teamOne: match.teamOne,
-        teamTwo: match.teamTwo
+        teamTwo: match.teamTwo, 
+        courtId: null
       }
       this.matchesCreated.push(m)
     }
@@ -98,8 +99,9 @@ export class Schedules {
   public async scheduleInit() {
 
     await this.getTournamentInfo();
-    this.scheduler();
-
+    let days = this.scheduler();// this.scheduler();
+    this.matchUpdate();
+    this.printSchedule(days);
   }
   /**
    * createDays
@@ -128,6 +130,12 @@ export class Schedules {
     }
     return days;
   }
+
+  /**
+ * scheduler
+ * @Description Create the schedule
+ * @returns days if the schedule is good, null if not
+ */
   private scheduler() {
     let days = this.createDays();
     let matchToEvaluate = {
@@ -141,18 +149,16 @@ export class Schedules {
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
-              this.ruleThree(courts, matchToEvaluate)) {
+              this.ruleThree(courts, matchToEvaluate, h)) {
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
-              this.updateHistoryId(matchToEvaluate);
+              this.updateHistoryId(matchToEvaluate, courts[c].id,  hour.hours, d);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
-              this.matchUpdate(matchToEvaluate, hour.hours, d, courts[c].id) 
               break;
-
             } else {
               matchToEvaluate.historicId = -1;
-              this.updateHistoryId(matchToEvaluate);
+              this.updateHistoryId(matchToEvaluate, null, null, null);
               matchToEvaluate = this.searchMatchFirstAvailable();
               //console.log('Fail ==> ', this.matchesCreated);
             }
@@ -179,6 +185,7 @@ export class Schedules {
         return match;
       }
     }
+    return null;
   }
 
   /**
@@ -196,12 +203,15 @@ export class Schedules {
   }
   /**
   * @name updateHistoryId
-  * @description this method update the history id, depending of it is valid isn't it
+  * @description this method update the history id, depending of it is valid or isn't it
   */
-  private updateHistoryId(m) {
+  private updateHistoryId(m, courtId, hour, day) {
     for (const match of this.matchesCreated) {
       if (match.id === m.id) {
         match.historicId = m.historicId
+        match.courtId = courtId, 
+        match.hour = hour,
+        match.day = day
       }
     }
   }
@@ -225,7 +235,7 @@ export class Schedules {
    * @param gMatch 
    * @param hour 
    * @param court 
-   * @returns scoreRuleOne
+   * @returns true if the rule is done or false if not
    */
   private ruleOne(courts, gMatch, hour, court): boolean {
 
@@ -248,22 +258,23 @@ export class Schedules {
    * @param hours 
    * @param gMatch 
    * @param hour 
+   * @returns true if the rule is done or false if not
    * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleTwo(hours, gMatch): boolean {
+  private ruleTwo(courts, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        continue;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
-          teamOne++;
-        }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          teamTwo++;
+    for (let j = 0; j < courts.length; j++) {
+      for (let i = 0; i < courts[j].hours.length; i++) {
+        if (!courts[j].hours[i].matchId) {
+          continue;
+        } else {
+          let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+          if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
+            teamOne++;
+          }
+          if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
+            teamTwo++;
+          }
         }
       }
     }
@@ -273,35 +284,61 @@ export class Schedules {
     return true;
   }
 
-  private countTimes(courts, teamId) {
-    let court = 0;
-    let counter = 0;
-    while (court < courts.length) {
-      courts[court].hours.forEach(hour => {
-        if (hour && hour.matchId && hour.matchId !== "") {
-          let teamsMatch = this.getTeamsFromMatch(hour.matchId);
+  /**
+   * @name ruleThree
+   * @param hours 
+   * @param gMatch 
+   * @param hour 
+   * @returns true if the rule is done or false if not
+   * @description Validate one team can not play more than four times in a day. 
+   */
+  private ruleThree(courts, gMatch, y): boolean {
+    let teamOne = true, teamTwo = true;
+    let times = 2;
+    teamOne = this.countTimesDown(courts, gMatch.teamOne, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamOne, y, y - times, true);
+    teamTwo = this.countTimesDown(courts, gMatch.teamTwo, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamTwo, y, y - times, true);
+    if (teamOne && teamTwo) {
+      return true;
+    }
+    return false;
+  }
+
+  private countTimesDown(courts, teamId, h, times, aux) {
+
+    if (h < times) { 
+      courts.forEach(court => {
+        if (court.hours[h + 1] && court.hours[h + 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h + 1].matchId);
           if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
-           counter++;
-          }else{
-            counter = 0;
+            aux = this.countTimesDown(courts, teamId, h + 1, times, aux);
           }
         }
       });
-      court++;
-    }
-    return counter;
-  }
-  private ruleThree(courts, gMatch) {
-    let teamOne = 0, teamTwo = 0;
-
-    teamOne = this.countTimes(courts, gMatch.teamOne);
-    teamTwo = this.countTimes(courts, gMatch.teamTwo);
-
-    if (teamOne >= 2 || teamTwo >= 2) {
+    }else{
       return false;
     }
-    return true;
+    return aux;
   }
+
+  private countTimesUp(courts, teamId, h, times, aux) {
+
+    if (times < h) { 
+      courts.forEach(court => {
+        if (court.hours[h - 1] && court.hours[h - 1].matchId && court.hours[h - 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h - 1].matchId);
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+            aux = this.countTimesUp(courts, teamId, h - 1, times, aux);
+          }
+        }
+      });
+    }else{
+      return false;
+    }
+    return aux;
+  }
+
   /**
    * @name getTeamsFromMatch
    * @description Get the teams from a match
@@ -329,19 +366,28 @@ export class Schedules {
    * @param courtid
    * @description it should update the match with its time and court
    */
-  private async matchUpdate(match, hour, day, court) {
+  private async matchUpdate() {
     let matchToUpdate = {
-      _id: match.id,
+      _id: null,
       dateMatch: null,
-      court: court
+      court: null
     };
-    let dateMatch = new Date(Date.parse(this.days[day]));
-    dateMatch.setHours(parseInt(hour));
-    dateMatch.setMinutes(0);
-    dateMatch.setSeconds(0)
-    matchToUpdate.dateMatch = dateMatch;
-    console.log('this is the match ==> ', matchToUpdate);
-    await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+    this.matchesCreated.forEach(async m => {
+      let dateMatch = new Date(Date.parse(this.days[m.day]));
+      dateMatch.setHours(parseInt(m.hour));
+      dateMatch.setMinutes(0);
+      dateMatch.setSeconds(0)
+      matchToUpdate.dateMatch = dateMatch;
+      matchToUpdate._id = m.id;
+      matchToUpdate.court = m.courtId;
+      await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+    });
+  }
+
+  private printSchedule(days) {
+
+    console.log(this.matchesCreated);
+
   }
 
 }
