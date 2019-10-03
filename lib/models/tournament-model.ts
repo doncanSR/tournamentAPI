@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-export const tournmanetSchema = new Schema({
+export const tournamentSchema = new Schema({
     id: {
         type: Schema.Types.ObjectId
     },
