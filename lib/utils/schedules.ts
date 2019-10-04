@@ -48,7 +48,8 @@ export class Schedules {
         id: match._id.toString(),
         historicId: 0,
         teamOne: match.teamOne,
-        teamTwo: match.teamTwo
+        teamTwo: match.teamTwo, 
+        courtId: null
       }
       this.matchesCreated.push(m)
     }
@@ -99,6 +100,7 @@ export class Schedules {
 
     await this.getTournamentInfo();
     let days = this.scheduler();// this.scheduler();
+    this.matchUpdate();
     this.printSchedule(days);
   }
   /**
@@ -150,15 +152,13 @@ export class Schedules {
               this.ruleThree(courts, matchToEvaluate, h)) {
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
-              this.updateHistoryId(matchToEvaluate);
+              this.updateHistoryId(matchToEvaluate, courts[c].id,  hour.hours, d);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
               break;
-              console.log('Success ==> ', this.matchesCreated);
-              console.log('This is days ==> ', days);
             } else {
               matchToEvaluate.historicId = -1;
-              this.updateHistoryId(matchToEvaluate);
+              this.updateHistoryId(matchToEvaluate, null, null, null);
               matchToEvaluate = this.searchMatchFirstAvailable();
               //console.log('Fail ==> ', this.matchesCreated);
             }
@@ -205,10 +205,13 @@ export class Schedules {
   * @name updateHistoryId
   * @description this method update the history id, depending of it is valid or isn't it
   */
-  private updateHistoryId(m) {
+  private updateHistoryId(m, courtId, hour, day) {
     for (const match of this.matchesCreated) {
       if (match.id === m.id) {
         match.historicId = m.historicId
+        match.courtId = courtId, 
+        match.hour = hour,
+        match.day = day
       }
     }
   }
@@ -363,19 +366,22 @@ export class Schedules {
    * @param courtid
    * @description it should update the match with its time and court
    */
-  private async matchUpdate(match, hour, day, court) {
+  private async matchUpdate() {
     let matchToUpdate = {
-      _id: match.id,
+      _id: null,
       dateMatch: null,
-      court: court
+      court: null
     };
-    let dateMatch = new Date(Date.parse(this.days[day]));
-    dateMatch.setHours(parseInt(hour));
-    dateMatch.setMinutes(0);
-    dateMatch.setSeconds(0)
-    matchToUpdate.dateMatch = dateMatch;
-    console.log('this is the match ==> ', matchToUpdate);
-    await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+    this.matchesCreated.forEach(async m => {
+      let dateMatch = new Date(Date.parse(this.days[m.day]));
+      dateMatch.setHours(parseInt(m.hour));
+      dateMatch.setMinutes(0);
+      dateMatch.setSeconds(0)
+      matchToUpdate.dateMatch = dateMatch;
+      matchToUpdate._id = m.id;
+      matchToUpdate.court = m.courtId;
+      await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+    });
   }
 
   private printSchedule(days) {
