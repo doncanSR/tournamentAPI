@@ -1,4 +1,4 @@
-import { tournmanetSchema } from "../models/tournament-model";
+import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 import { groupSchema } from "../models/group-model";
@@ -6,7 +6,7 @@ import { CourtSchema } from "../models/court-model";
 
 const Match = mongoose.model('Match', matchSchema);
 const Group = mongoose.model('Group', groupSchema)
-const Tournament = mongoose.model('Tournament', tournmanetSchema);
+const Tournament = mongoose.model('Tournament', tournamentSchema);
 const Court = mongoose.model('Court', CourtSchema)
 
 export class Schedules {
