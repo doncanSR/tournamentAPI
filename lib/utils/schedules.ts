@@ -100,7 +100,7 @@ export class Schedules {
 
     await this.getTournamentInfo();
     let days = this.scheduler();// this.scheduler();
-    this.matchUpdate();
+    //this.matchUpdate();
     this.printSchedule(days);
   }
   /**
@@ -138,23 +138,29 @@ export class Schedules {
  */
   private scheduler() {
     let days = this.createDays();
+    let h = 0, c = 0;
     let matchToEvaluate = {
       id: '',
       historicId: 0
     };
     let historyIdSuccess = 0;
+    console.log('This are de days --> ',days);
     for (const [d, courts] of days.entries()) { //days
-      for (const [c, court] of courts.entries()) { // courts
-        for (const [h, hour] of court.hours.entries()) { // hours 
+      //for (const [h, hour] of court.hours.entries()) { // hours 
+      while(courts[c] && courts[c].hours[h]){
+        //for (const [c, courts] of day.entries()) { // courtss
+        while(courts[c]){
+          if (!courts[c].hours[h]) { break; }    
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
               this.ruleThree(courts, matchToEvaluate, h)) {
-              hour.matchId = matchToEvaluate.id;
+              courts[c].hours[h].matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
-              this.updateHistoryId(matchToEvaluate, courts[c].id,  hour.hours, d);
+              this.updateHistoryId(matchToEvaluate, courts[c].id, courts[c].hours[h], d);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
+              c++;
               break;
             } else {
               matchToEvaluate.historicId = -1;
@@ -170,8 +176,11 @@ export class Schedules {
             return days;
           }
         }
+        c=0;
+        h++;
       }
     }
+    console.log('This are de days --> ',days);
 
   }
   /**
