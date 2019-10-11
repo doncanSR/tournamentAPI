@@ -139,6 +139,7 @@ export class Schedules {
   private scheduler() {
     let days = this.createDays();
     let h = 0, c = 0;
+    let longestCourt = this.getLongestCourt(days[0]);
     let matchToEvaluate = {
       id: '',
       historicId: 0
@@ -147,10 +148,13 @@ export class Schedules {
     console.log('This are de days --> ',days);
     for (const [d, courts] of days.entries()) { //days
       //for (const [h, hour] of court.hours.entries()) { // hours 
-      while(courts[c] && courts[c].hours[h]){
+      while(courts[c] && h < longestCourt){
         //for (const [c, courts] of day.entries()) { // courtss
         while(courts[c]){
-          if (!courts[c].hours[h]) { break; }    
+          if (!courts[c].hours[h]) {
+            c++;
+            continue;
+          }    
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
@@ -171,7 +175,7 @@ export class Schedules {
           }
           if (!matchToEvaluate && this.searchPendingMatches()) {
             this.searchForPending();
-            continue;
+            break;
           } else if (!matchToEvaluate) {
             return days;
           }
@@ -179,6 +183,7 @@ export class Schedules {
         c=0;
         h++;
       }
+      h = 0;
     }
     console.log('This are de days --> ',days);
 
@@ -196,7 +201,20 @@ export class Schedules {
     }
     return null;
   }
-
+  /**
+   * @name getLongestCourt
+   * @description this method look for the longest court
+   * @returns the size of the largest court
+   */
+  private getLongestCourt(courts) {
+    let number = 0;
+    courts.forEach(court => {
+      if (number < court.hours.length ) {
+        number = court.hours.length;
+      }
+    });
+    return number;
+  }
   /**
 * @name searchPendingMatches
 * @description this method look for the matches who are pending
