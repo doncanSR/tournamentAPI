@@ -53,6 +53,7 @@ export class Schedules {
       }
       this.matchesCreated.push(m)
     }
+    this.matchesCreated = this.matchesCreated.sort(() => Math.random() - 0.5)
     this.courts = await Court.find({}).sort({ 'availability': -1 });
     this.maxGroup = await Group.aggregate([
       { $unwind: "$teamID" },
