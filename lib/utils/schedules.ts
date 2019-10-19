@@ -1,4 +1,4 @@
-import { tournmanetSchema } from "../models/tournament-model";
+import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 import { groupSchema } from "../models/group-model";
@@ -6,7 +6,7 @@ import { CourtSchema } from "../models/court-model";
 
 const Match = mongoose.model('Match', matchSchema);
 const Group = mongoose.model('Group', groupSchema)
-const Tournament = mongoose.model('Tournament', tournmanetSchema);
+const Tournament = mongoose.model('Tournament', tournamentSchema);
 const Court = mongoose.model('Court', CourtSchema)
 
 export class Schedules {
@@ -101,7 +101,11 @@ export class Schedules {
 
     await this.getTournamentInfo();
     let days = this.scheduler();// this.scheduler();
+<<<<<<< HEAD
     //this.matchUpdate();
+=======
+    this.matchUpdate();
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
     this.printSchedule(days);
   }
   /**
@@ -160,12 +164,20 @@ export class Schedules {
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
               this.ruleThree(courts, matchToEvaluate, h)) {
+<<<<<<< HEAD
               courts[c].hours[h].matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
               this.updateHistoryId(matchToEvaluate, courts[c].id, courts[c].hours[h], d);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
               c++;
+=======
+              hour.matchId = matchToEvaluate.id;
+              matchToEvaluate.historicId = ++historyIdSuccess;
+              this.updateHistoryId(matchToEvaluate, courts[c].id,  hour.hours, d);
+              this.searchForPending();
+              matchToEvaluate = this.searchMatchFirstAvailable();
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
               break;
             } else {
               matchToEvaluate.historicId = -1;
@@ -201,6 +213,7 @@ export class Schedules {
       }
     }
     return null;
+<<<<<<< HEAD
   }
   /**
    * @name getLongestCourt
@@ -215,6 +228,8 @@ export class Schedules {
       }
     });
     return number;
+=======
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
   }
   /**
 * @name searchPendingMatches
