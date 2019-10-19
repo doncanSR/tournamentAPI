@@ -53,6 +53,7 @@ export class Schedules {
       }
       this.matchesCreated.push(m)
     }
+    this.matchesCreated = this.matchesCreated.sort(() => Math.random() - 0.5)
     this.courts = await Court.find({}).sort({ 'availability': -1 });
     this.maxGroup = await Group.aggregate([
       { $unwind: "$teamID" },
@@ -100,7 +101,11 @@ export class Schedules {
 
     await this.getTournamentInfo();
     let days = this.scheduler();// this.scheduler();
+<<<<<<< HEAD
+    //this.matchUpdate();
+=======
     this.matchUpdate();
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
     this.printSchedule(days);
   }
   /**
@@ -138,23 +143,41 @@ export class Schedules {
  */
   private scheduler() {
     let days = this.createDays();
+    let h = 0, c = 0;
+    let longestCourt = this.getLongestCourt(days[0]);
     let matchToEvaluate = {
       id: '',
       historicId: 0
     };
     let historyIdSuccess = 0;
+    console.log('This are de days --> ',days);
     for (const [d, courts] of days.entries()) { //days
-      for (const [c, court] of courts.entries()) { // courts
-        for (const [h, hour] of court.hours.entries()) { // hours 
+      //for (const [h, hour] of court.hours.entries()) { // hours 
+      while(courts[c] && h < longestCourt){
+        //for (const [c, courts] of day.entries()) { // courtss
+        while(courts[c]){
+          if (!courts[c].hours[h]) {
+            c++;
+            continue;
+          }    
           matchToEvaluate = this.searchMatchFirstAvailable();
           while (matchToEvaluate) {
             if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
               this.ruleThree(courts, matchToEvaluate, h)) {
+<<<<<<< HEAD
+              courts[c].hours[h].matchId = matchToEvaluate.id;
+              matchToEvaluate.historicId = ++historyIdSuccess;
+              this.updateHistoryId(matchToEvaluate, courts[c].id, courts[c].hours[h], d);
+              this.searchForPending();
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              c++;
+=======
               hour.matchId = matchToEvaluate.id;
               matchToEvaluate.historicId = ++historyIdSuccess;
               this.updateHistoryId(matchToEvaluate, courts[c].id,  hour.hours, d);
               this.searchForPending();
               matchToEvaluate = this.searchMatchFirstAvailable();
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
               break;
             } else {
               matchToEvaluate.historicId = -1;
@@ -165,13 +188,17 @@ export class Schedules {
           }
           if (!matchToEvaluate && this.searchPendingMatches()) {
             this.searchForPending();
-            continue;
+            break;
           } else if (!matchToEvaluate) {
             return days;
           }
         }
+        c=0;
+        h++;
       }
+      h = 0;
     }
+    console.log('This are de days --> ',days);
 
   }
   /**
@@ -186,8 +213,24 @@ export class Schedules {
       }
     }
     return null;
+<<<<<<< HEAD
   }
-
+  /**
+   * @name getLongestCourt
+   * @description this method look for the longest court
+   * @returns the size of the largest court
+   */
+  private getLongestCourt(courts) {
+    let number = 0;
+    courts.forEach(court => {
+      if (number < court.hours.length ) {
+        number = court.hours.length;
+      }
+    });
+    return number;
+=======
+>>>>>>> 0b214aca70afc5da419a4cdd2018cf514acdd43c
+  }
   /**
 * @name searchPendingMatches
 * @description this method look for the matches who are pending
