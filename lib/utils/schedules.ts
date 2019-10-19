@@ -45,7 +45,7 @@ export class Schedules {
     let matches = await Match.find({ 'tournamentID': this.tournamentId });
     for (const match of matches) {
       let m = {
-        id: match._id.toString(),
+        id: match._id,
         historicId: 0,
         teamOne: match.teamOne,
         teamTwo: match.teamTwo, 
@@ -100,8 +100,8 @@ export class Schedules {
   public async scheduleInit() {
 
     await this.getTournamentInfo();
-    let days = this.scheduler();// this.scheduler();
-    //this.matchUpdate();
+    let days = this.scheduler();
+    this.matchUpdate();
     this.printSchedule(days);
   }
   /**
@@ -115,7 +115,7 @@ export class Schedules {
       let day = [];
       for (const court of this.courts) {
         let ct = {
-          id: court._id.toString(),
+          id: court._id,
           hours: []
         };
         for (const dayHour of court.dayHours) {
@@ -146,7 +146,6 @@ export class Schedules {
       historicId: 0
     };
     let historyIdSuccess = 0;
-    console.log('This are de days --> ',days);
     for (const [d, courts] of days.entries()) { //days
       //for (const [h, hour] of court.hours.entries()) { // hours 
       while(courts[c] && h < longestCourt){
@@ -186,7 +185,6 @@ export class Schedules {
       }
       h = 0;
     }
-    console.log('This are de days --> ',days);
 
   }
   /**
@@ -235,7 +233,7 @@ export class Schedules {
   */
   private updateHistoryId(m, courtId, hour, day) {
     for (const match of this.matchesCreated) {
-      if (match.id === m.id) {
+      if (match.id.toString() === m.id.toString()) {
         match.historicId = m.historicId
         match.courtId = courtId, 
         match.hour = hour,
@@ -270,10 +268,10 @@ export class Schedules {
     for (let i = 0; i < courts.length; i++) {
       if (!courts[i].hours[hour]) {
         continue;
-      } else if (i !== court) {
+      } else if (i !== court && courts[i].hours[hour].matchId) {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
-        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamTwo === teamsMatch[0]
-          || gMatch.teamOne === teamsMatch[1] || gMatch.teamTwo === teamsMatch[1]) {
+        if (gMatch.teamOne.toString() === teamsMatch[0].toString() || gMatch.teamTwo === teamsMatch[0].toString()
+          || gMatch.teamOne.toString() === teamsMatch[1].toString() || gMatch.teamTwo === teamsMatch[1].toString()) {
           return false;
         }
       }
@@ -297,10 +295,10 @@ export class Schedules {
           continue;
         } else {
           let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-          if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
+          if (gMatch.teamOne.toString() === teamsMatch[0] || gMatch.teamOne.toString() === teamsMatch[1].toString()) {
             teamOne++;
           }
-          if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
+          if (gMatch.teamTwo.toString() === teamsMatch[0].toString() || gMatch.teamTwo.toString() === teamsMatch[1].toString()) {
             teamTwo++;
           }
         }
@@ -339,7 +337,7 @@ export class Schedules {
       courts.forEach(court => {
         if (court.hours[h + 1] && court.hours[h + 1].matchId != '') {
           let teamsMatch = this.getTeamsFromMatch(court.hours[h + 1].matchId);
-          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
             aux = this.countTimesDown(courts, teamId, h + 1, times, aux);
           }
         }
@@ -356,7 +354,7 @@ export class Schedules {
       courts.forEach(court => {
         if (court.hours[h - 1] && court.hours[h - 1].matchId && court.hours[h - 1].matchId != '') {
           let teamsMatch = this.getTeamsFromMatch(court.hours[h - 1].matchId);
-          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
+          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
             aux = this.countTimesUp(courts, teamId, h - 1, times, aux);
           }
         }
@@ -379,7 +377,7 @@ export class Schedules {
       return teams;
     }
     for (const match of this.matchesCreated) {
-      if (match.id === matchId) {
+      if (match.id.toString() === matchId.toString()) {
         teams.push(match.teamOne);
         teams.push(match.teamTwo);
       }
@@ -402,11 +400,11 @@ export class Schedules {
     };
     this.matchesCreated.forEach(async m => {
       let dateMatch = new Date(Date.parse(this.days[m.day]));
-      dateMatch.setHours(parseInt(m.hour));
+      dateMatch.setHours(parseInt(m.hour.hours));
       dateMatch.setMinutes(0);
       dateMatch.setSeconds(0)
       matchToUpdate.dateMatch = dateMatch;
-      matchToUpdate._id = m.id;
+      matchToUpdate._id = mongoose.Types.ObjectId(m.id);
       matchToUpdate.court = m.courtId;
       await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
     });
