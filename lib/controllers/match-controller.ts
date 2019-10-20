@@ -70,28 +70,27 @@ export class MatchController {
           foreignField: "_id",
           as: "team_two"
         }
+      },
+      {
+        $lookup: {
+          from: "courts",
+          localField: "court",
+          foreignField: "_id",
+          as: "court_data"
+        }
       }
     ]).sort({ dateMatch: 1 }).exec((err, matches) => {
       if (err) {
         res.send(err);
       }
-      let weekday = new Array();
-      weekday[0] = "Sunday";
-      weekday[1] = "Monday";
-      weekday[2] = "Tuesday";
-      weekday[3] = "Wednesday";
-      weekday[4] = "Thursday";
-      weekday[5] = "Friday";
-      weekday[6] = "Saturday";
 
       let schedules = matches.map(match => {
         return {
-          MatchId: match._id.toString(),
-          Date: weekday[match.dateMatch.getUTCDay()],
-          Time: match.dateMatch.getHours() + ':' + match.dateMatch.getMinutes() + ':' + match.dateMatch.getSeconds(),
-          Court: match.court,
-          TeamOne: match.team_one[0].name,
-          TeamTwo: match.team_two[0].name
+          matchId: match._id.toString(),
+          date: match.dateMatch,
+          teamOne: match.team_one[0].name,
+          teamTwo: match.team_two[0].name,
+          court: match.court_data[0].name
         }
       });
       res.status(200).json(schedules);
