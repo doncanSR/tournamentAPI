@@ -8,16 +8,16 @@ export const matchSchema = new Schema({
         type: Schema.Types.ObjectId
     },
     teamOne: {
-        type: String
+        type: Schema.Types.ObjectId
     },
     teamTwo: {
-        type: String
+        type: Schema.Types.ObjectId
     },
     faseID: {
         type: String
     },
     court: {
-        type: String
+        type: Schema.Types.ObjectId
     },
     dateMatch: {
         type: Date

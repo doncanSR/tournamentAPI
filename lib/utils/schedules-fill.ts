@@ -113,7 +113,7 @@ export class Schedulefill {
     if (this.allTeams && this.allTeams.length >= teamsPerGroup) {
       for (let i = 0; i < teamsPerGroup; i++) {
         numberRan = Math.floor(Math.random() * this.allTeams.length);
-        this.teamsID[i] = this.allTeams[numberRan]._id.toString();
+        this.teamsID[i] = this.allTeams[numberRan]._id;
         this.allTeams.splice(numberRan, 1);
       }
     } else {

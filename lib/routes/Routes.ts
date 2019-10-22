@@ -96,6 +96,8 @@ export class Routes {
       .post(this.verifyToken.check, this.role.levelTwo, this.matchController.addNewMatch)
       .delete(this.verifyToken.check, this.role.levelOne, this.matchController.deleteMatch)
       .put(this.matchController.updateMatch)
+    app.route('/match/schedules')
+      .get(this.matchController.getSchedule)
     // Referee
     app.route('/referee')
       .get(this.verifyToken.check, this.role.levelTwo, this.refereeController.getReferee)

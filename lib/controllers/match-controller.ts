@@ -50,6 +50,53 @@ export class MatchController {
     });
   }
 
+  /**
+   * getSchedule
+   */
+  public getSchedule(req: Request, res: Response) {
+    Match.aggregate([
+      {
+        $lookup: {
+          from: "teams",
+          localField: "teamOne",
+          foreignField: "_id",
+          as: "team_one"
+        }
+      },
+      {
+        $lookup: {
+          from: "teams",
+          localField: "teamTwo",
+          foreignField: "_id",
+          as: "team_two"
+        }
+      },
+      {
+        $lookup: {
+          from: "courts",
+          localField: "court",
+          foreignField: "_id",
+          as: "court_data"
+        }
+      }
+    ]).sort({ dateMatch: 1 }).exec((err, matches) => {
+      if (err) {
+        res.send(err);
+      }
+
+      let schedules = matches.map(match => {
+        return {
+          matchId: match._id.toString(),
+          date: match.dateMatch,
+          teamOne: match.team_one[0].name,
+          teamTwo: match.team_two[0].name,
+          court: match.court_data[0].name
+        }
+      });
+      res.status(200).json(schedules);
+    })
+  }
+
   public deleteMatch(req: Request, res: Response) {
     Match.remove({ _id: req.params.matchId }, (err, match) => {
       if (err) {

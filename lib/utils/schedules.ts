@@ -1,4 +1,4 @@
-import { tournmanetSchema } from "../models/tournament-model";
+import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 import { groupSchema } from "../models/group-model";
@@ -6,7 +6,7 @@ import { CourtSchema } from "../models/court-model";
 
 const Match = mongoose.model('Match', matchSchema);
 const Group = mongoose.model('Group', groupSchema)
-const Tournament = mongoose.model('Tournament', tournmanetSchema);
+const Tournament = mongoose.model('Tournament', tournamentSchema);
 const Court = mongoose.model('Court', CourtSchema)
 
 export class Schedules {
@@ -17,8 +17,9 @@ export class Schedules {
   days: string[] = [];
   matchesPerDay: number;
   allPosibleMatches: number;
-  matchesCreated: any;
+  matchesCreated: any = [];
   maxGroup: any;
+  asiggnedMatches: any;
 
   constructor(tournamenId: string) {
     this.tournamentId = tournamenId;
@@ -41,7 +42,18 @@ export class Schedules {
       allDays.push(dToSave.toISOString());
     }
     this.days = allDays;
-    this.matchesCreated = await Match.find({ 'tournamentID': this.tournamentId });
+    let matches = await Match.find({ 'tournamentID': this.tournamentId });
+    for (const match of matches) {
+      let m = {
+        id: match._id,
+        historicId: 0,
+        teamOne: match.teamOne,
+        teamTwo: match.teamTwo, 
+        courtId: null
+      }
+      this.matchesCreated.push(m)
+    }
+    this.matchesCreated = this.matchesCreated.sort(() => Math.random() - 0.5)
     this.courts = await Court.find({}).sort({ 'availability': -1 });
     this.maxGroup = await Group.aggregate([
       { $unwind: "$teamID" },
@@ -87,42 +99,14 @@ export class Schedules {
    */
   public async scheduleInit() {
 
-
-    let groups = [];
-    let days = [];
-    let worseIndividual = { days: [], score: 0 };
-    let bestIndividual = { days: [], score: 9999 };
-    let index = 0
     await this.getTournamentInfo();
-
-    for (const group of this.maxGroup) {
-      let matches = await Match.find({ 'groupName': group._id.toString() });
-      let gp = {
-        id: group._id.toString(),
-        matches: matches
-      };
-      groups.push(gp);
-    }
-    for (index; index < 400; index++) {
-      let individual = { days: [], score: 0 };
-      let days = this.createDays();
-      let i;
-      individual.days = this.createIndividual(groups, days);
-      i = this.fitnessFunction(individual);
-      if (i.score > worseIndividual.score) {
-        worseIndividual = i;
-      }
-      if (i.score < bestIndividual.score) {
-        bestIndividual = i;
-      }
-    }
-    console.log('Best: ', bestIndividual);
-    console.log('Worse: ', worseIndividual);
-    console.log('poblation number: ', index);
+    let days = this.scheduler();
+    this.matchUpdate();
+    this.printSchedule(days);
   }
   /**
    * createDays
-   * @Description 
+   * @Description Vreate objec day it has the schedule per day 
    * @returns days object
    */
   private createDays(): any {
@@ -131,7 +115,7 @@ export class Schedules {
       let day = [];
       for (const court of this.courts) {
         let ct = {
-          id: court._id.toString(),
+          id: court._id,
           hours: []
         };
         for (const dayHour of court.dayHours) {
@@ -149,51 +133,125 @@ export class Schedules {
   }
 
   /**
-   * individual
-   * @param groups
-   * @param days
-   * @returns an individual
-   */
-  private createIndividual(groups, days) {
-    let complete = this.matchesCreated.length;
-
-    while (complete !== 0) {
-      let randomGroup = Math.floor(Math.random() * groups.length);
-      let randomMatch = Math.floor(Math.random() * groups[randomGroup].matches.length);
-      let randomDay = Math.floor(Math.random() * days.length);
-      let randomCourt = Math.floor(Math.random() * days[randomDay].length);
-      let randomHour = Math.floor(Math.random() * days[randomDay][randomCourt].hours.length);
-      if (!days[randomDay][randomCourt].hours[randomHour].matchId) {
-        days[randomDay][randomCourt].hours[randomHour].matchId = groups[randomGroup].matches[randomMatch]._id.toString();
-        complete--;
+ * scheduler
+ * @Description Create the schedule
+ * @returns days if the schedule is good, null if not
+ */
+  private scheduler() {
+    let days = this.createDays();
+    let h = 0, c = 0;
+    let longestCourt = this.getLongestCourt(days[0]);
+    let matchToEvaluate = {
+      id: '',
+      historicId: 0
+    };
+    let historyIdSuccess = 0;
+    for (const [d, courts] of days.entries()) { //days
+      //for (const [h, hour] of court.hours.entries()) { // hours 
+      while(courts[c] && h < longestCourt){
+        //for (const [c, courts] of day.entries()) { // courtss
+        while(courts[c]){
+          if (!courts[c].hours[h]) {
+            c++;
+            continue;
+          }    
+          matchToEvaluate = this.searchMatchFirstAvailable();
+          while (matchToEvaluate) {
+            if (this.ruleOne(courts, matchToEvaluate, h, c) && this.ruleTwo(courts, matchToEvaluate) &&
+              this.ruleThree(courts, matchToEvaluate, h)) {
+              courts[c].hours[h].matchId = matchToEvaluate.id;
+              matchToEvaluate.historicId = ++historyIdSuccess;
+              this.updateHistoryId(matchToEvaluate, courts[c].id, courts[c].hours[h], d);
+              this.searchForPending();
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              c++;
+              break;
+            } else {
+              matchToEvaluate.historicId = -1;
+              this.updateHistoryId(matchToEvaluate, null, null, null);
+              matchToEvaluate = this.searchMatchFirstAvailable();
+              //console.log('Fail ==> ', this.matchesCreated);
+            }
+          }
+          if (!matchToEvaluate && this.searchPendingMatches()) {
+            this.searchForPending();
+            break;
+          } else if (!matchToEvaluate) {
+            return days;
+          }
+        }
+        c=0;
+        h++;
       }
-
-
+      h = 0;
     }
-    return days;
+
   }
   /**
-   * fitnessFunction
-   * @param gMatch
-   * @param individual
-   * @description it is the score function, where evalute each gen inside the individual
-   * @returns score
-   * 
+   * @name searchMatchFirstAvailable
+   * @description this method look for the firts match avaiblable
+   * @returns the first match avaiblable
    */
-  private fitnessFunction(individual): any {
-    let score = 0;
-    for (let i = 0; i < individual.days.length; i++) {
-      for (let j = 0; j < individual.days[i].length; j++) {
-        for (let k = 0; k < individual.days[i][j].hours.length; k++) {
-          score += this.ruleOne(individual.days[i], individual.days[i][j].hours[k].matchId, k, j);
-          score += this.ruleTwo(individual.days[i][j].hours, individual.days[i][j].hours[k].matchId);
-          score += this.ruleThree(individual.days[i][j].hours, individual.days[i][j].hours[k].matchId);
-          score += this.ruleFour(individual.days.length, individual.days[i][j].hours);
-        }
+  private searchMatchFirstAvailable() {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === 0) {
+        return match;
       }
     }
-    individual.score = Math.round(score * 100) / 100;
-    return individual;
+    return null;
+  }
+  /**
+   * @name getLongestCourt
+   * @description this method look for the longest court
+   * @returns the size of the largest court
+   */
+  private getLongestCourt(courts) {
+    let number = 0;
+    courts.forEach(court => {
+      if (number < court.hours.length ) {
+        number = court.hours.length;
+      }
+    });
+    return number;
+  }
+  /**
+* @name searchPendingMatches
+* @description this method look for the matches who are pending
+* @returns true if there are any match pending, if not false
+*/
+  private searchPendingMatches(): boolean {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+  * @name updateHistoryId
+  * @description this method update the history id, depending of it is valid or isn't it
+  */
+  private updateHistoryId(m, courtId, hour, day) {
+    for (const match of this.matchesCreated) {
+      if (match.id.toString() === m.id.toString()) {
+        match.historicId = m.historicId
+        match.courtId = courtId, 
+        match.hour = hour,
+        match.day = day
+      }
+    }
+  }
+  /**
+   * @name searchForPending
+   * @description this method makes available all the pendings matches
+   * @returns the first match avaiblable
+   */
+  private searchForPending() {
+    for (const match of this.matchesCreated) {
+      if (match.historicId === -1) {
+        match.historicId = 0
+      }
+    }
   }
 
   /**
@@ -203,27 +261,22 @@ export class Schedules {
    * @param gMatch 
    * @param hour 
    * @param court 
-   * @returns scoreRuleOne
+   * @returns true if the rule is done or false if not
    */
-  private ruleOne(courts, gMatch, hour, court): number {
-    let scoreRuleOne = 0;
-    if (!gMatch) {
-      return 0;
-    }
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
+  private ruleOne(courts, gMatch, hour, court): boolean {
 
     for (let i = 0; i < courts.length; i++) {
       if (!courts[i].hours[hour]) {
         continue;
-      } else if (i !== court) {
+      } else if (i !== court && courts[i].hours[hour].matchId) {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[0]
-          || teamsMatchToEvaluate[0] === teamsMatch[1] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          scoreRuleOne++;
+        if (gMatch.teamOne.toString() === teamsMatch[0].toString() || gMatch.teamTwo === teamsMatch[0].toString()
+          || gMatch.teamOne.toString() === teamsMatch[1].toString() || gMatch.teamTwo === teamsMatch[1].toString()) {
+          return false;
         }
       }
     }
-    return scoreRuleOne;
+    return true;
 
   }
   /**
@@ -231,93 +284,87 @@ export class Schedules {
    * @param hours 
    * @param gMatch 
    * @param hour 
-   * @description Validate one team can not play more than three times in a day. 
+   * @returns true if the rule is done or false if not
+   * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleTwo(hours, gMatch): number {
-    let scoreRuleTwo = 0;
+  private ruleTwo(courts, gMatch): boolean {
     let teamOne = 0, teamTwo = 0;
-    if (!gMatch) {
-      return 0;
-    }
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        continue;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
-          teamOne++;
-        }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          teamTwo++;
+    for (let j = 0; j < courts.length; j++) {
+      for (let i = 0; i < courts[j].hours.length; i++) {
+        if (!courts[j].hours[i].matchId) {
+          continue;
+        } else {
+          let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
+          if (gMatch.teamOne.toString() === teamsMatch[0] || gMatch.teamOne.toString() === teamsMatch[1].toString()) {
+            teamOne++;
+          }
+          if (gMatch.teamTwo.toString() === teamsMatch[0].toString() || gMatch.teamTwo.toString() === teamsMatch[1].toString()) {
+            teamTwo++;
+          }
         }
       }
     }
-    if (teamOne >= 3 || teamTwo >= 3) {
-      scoreRuleTwo += 0.2;
+    if (teamOne >= 4 || teamTwo >= 4) {
+      return false;
     }
-    return scoreRuleTwo;
+    return true;
   }
+
   /**
    * @name ruleThree
    * @param hours 
    * @param gMatch 
    * @param hour 
-   * @description One team can not wait more than two matches to play again.
+   * @returns true if the rule is done or false if not
+   * @description Validate one team can not play more than four times in a day. 
    */
-  private ruleThree(hours, gMatch): number {
-    let scoreRuleThree = 0;
-    let teamOne = 0, teamTwo = 0;
-    if (!gMatch) {
-      return 0;
+  private ruleThree(courts, gMatch, y): boolean {
+    let teamOne = true, teamTwo = true;
+    let times = 2;
+    teamOne = this.countTimesDown(courts, gMatch.teamOne, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamOne, y, y - times, true);
+    teamTwo = this.countTimesDown(courts, gMatch.teamTwo, y, y + times, true) &&
+              (y - times < 0) ? true: this.countTimesUp(courts, gMatch.teamTwo, y, y - times, true);
+    if (teamOne && teamTwo) {
+      return true;
     }
-    let teamsMatchToEvaluate = this.getTeamsFromMatch(gMatch);
-    for (let i = 0; i < hours.length; i++) {
-      if (!hours[i].matchId) {
-        teamOne++;
-        teamTwo++;
-        continue;
-      } else {
-        let teamsMatch = this.getTeamsFromMatch(hours[i].matchId);
-        if (teamsMatchToEvaluate[0] === teamsMatch[0] || teamsMatchToEvaluate[0] === teamsMatch[1]) {
-          teamOne = 0;
-        } else {
-          teamOne++;
-        }
-        if (teamsMatchToEvaluate[1] === teamsMatch[0] || teamsMatchToEvaluate[1] === teamsMatch[1]) {
-          teamTwo = 0;
-        } else {
-          teamTwo++;
-        }
-      }
-    }
-    if (teamOne >= 2 || teamTwo >= 2) {
-      scoreRuleThree += 0.2;
-    }
-    return scoreRuleThree;
+    return false;
   }
-  /**
-   * @name ruleFour
-   * @description There are not empty spaces
-   * @param matchId 
-   * @returns score
-   */
-  private ruleFour(nDays, hours): number {
-    let scoreRuleFour = 0;
-    for (let i = 0; i < nDays; i++) {
-      let scoreProd = 1 + i;
-      let spaceCounter = 0;
-      for (let j = 0; j < hours.length; j++ ){
-        if (!hours[j].matchId) {
-          scoreRuleFour += ++spaceCounter * scoreProd;
-        } else {
-          spaceCounter = 0;
-        }
-      }
 
+  private countTimesDown(courts, teamId, h, times, aux) {
+
+    if (h < times) { 
+      courts.forEach(court => {
+        if (court.hours[h + 1] && court.hours[h + 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h + 1].matchId);
+          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
+            aux = this.countTimesDown(courts, teamId, h + 1, times, aux);
+          }
+        }
+      });
+    }else{
+      return false;
     }
-    return (scoreRuleFour/1000);
+    return aux;
   }
+
+  private countTimesUp(courts, teamId, h, times, aux) {
+
+    if (times < h) { 
+      courts.forEach(court => {
+        if (court.hours[h - 1] && court.hours[h - 1].matchId && court.hours[h - 1].matchId != '') {
+          let teamsMatch = this.getTeamsFromMatch(court.hours[h - 1].matchId);
+          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
+            aux = this.countTimesUp(courts, teamId, h - 1, times, aux);
+          }
+        }
+      });
+    }else{
+      return false;
+    }
+    return aux;
+  }
+
   /**
    * @name getTeamsFromMatch
    * @description Get the teams from a match
@@ -330,7 +377,7 @@ export class Schedules {
       return teams;
     }
     for (const match of this.matchesCreated) {
-      if (match._id.toString() === matchId) {
+      if (match.id.toString() === matchId.toString()) {
         teams.push(match.teamOne);
         teams.push(match.teamTwo);
       }
@@ -340,16 +387,33 @@ export class Schedules {
   /**
    * matchUpdate
    * @param match 
-   * @param hour
+   * @param hour eg. "10:00"
+   * @param day number
+   * @param courtid
    * @description it should update the match with its time and court
    */
-  private async matchUpdate(match, hour, day) {
-    let matchToUpdate = match;
-    let dateMatch = new Date(Date.parse(this.days[day]));
-    dateMatch.setHours(parseInt(hour[0]));
-    match.dateMatch = dateMatch;
-    // let correct = await this.fourRules(match);
-    console.log('this is the match ==> ', match);
+  private async matchUpdate() {
+    let matchToUpdate = {
+      _id: null,
+      dateMatch: null,
+      court: null
+    };
+    this.matchesCreated.forEach(async m => {
+      let dateMatch = new Date(Date.parse(this.days[m.day]));
+      dateMatch.setHours(parseInt(m.hour.hours));
+      dateMatch.setMinutes(0);
+      dateMatch.setSeconds(0)
+      matchToUpdate.dateMatch = dateMatch;
+      matchToUpdate._id = mongoose.Types.ObjectId(m.id);
+      matchToUpdate.court = m.courtId;
+      await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+    });
+  }
+
+  private printSchedule(days) {
+
+    console.log(this.matchesCreated);
+
   }
 
 }
