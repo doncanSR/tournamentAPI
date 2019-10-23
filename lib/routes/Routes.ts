@@ -1,31 +1,17 @@
 // Core 
 import { Request, Response } from "express";
-// Controllers
-import { TournamentController } from "../controllers/tournament-controller";
-import { TeamController } from "../controllers/team-controller";
-import { GroupController } from "../controllers/group-controller";
-import { CatFaseController } from "../controllers/cat-fase-controller";
-import { FaseController } from "../controllers/fase-controller";
-import { PlayerController } from "../controllers/player-controller";
-import { MatchController } from "../controllers/match-controller";
-import { RefereeController } from "../controllers/referee-controller";
-import { VerifyToken } from "../utils/verifyTokem";
-import { Roles } from "../controllers/roles-controller";
-import { CourtController } from "../controllers/court-controller";
-
+// Routes
+import { faseRoutes } from "./fase-routes";
+import { tournamentRoutes } from "./tournament-routes";
+import { catFaseRoutes } from "./cat-fase-routes";
+import { playerRoutes } from "./player-routes";
+import { teamRoutes } from "./team-routes";
+import { groupRoutes } from "./group-routes";
+import { roleRoutes } from "./role-routes";
+import { refereeRoutes } from "./referee-routes";
+import { matchRoutes } from "./match-routes";
+import { courtRoutes } from "./court-routes";
 export class Routes {
-
-  public tournamentController: TournamentController = new TournamentController();
-  public teamController: TeamController = new TeamController();
-  public groupController: GroupController = new GroupController();
-  public catFaseController: CatFaseController = new CatFaseController();
-  public faseController: FaseController = new FaseController();
-  public playerController: PlayerController = new PlayerController();
-  public matchController: MatchController = new MatchController();
-  public refereeController: RefereeController = new RefereeController();
-  public role: Roles = new Roles();
-  public verifyToken: VerifyToken = new VerifyToken();
-  public courtController: CourtController = new CourtController();
 
   public routes(app): void {
     //Server status
@@ -36,82 +22,25 @@ export class Routes {
         })
       })
     //Tournament
-    app.route('/tournament')
-      .get(this.tournamentController.getTournament)
-      .post(this.verifyToken.check, this.role.levelOne, this.tournamentController.addNewTournament)
-      .delete(this.verifyToken.check, this.role.adminLevel, this.tournamentController.deleteTournament)
-      .put(this.tournamentController.updateTournament)
-
+    app.use('/api/v1/tournament', tournamentRoutes)
     // Teams
-    app.route('/teams')
-      .get(this.teamController.getTeam)
-      .post(this.verifyToken.check, this.teamController.addNewTeam)
-      .delete(this.verifyToken.check, this.role.levelOne, this.teamController.deleteTeam)
-      .put(this.teamController.updateTeam)
+    app.use('/api/v1/teams', teamRoutes)
     //Group
-    app.route('/gruop')
-      .get(this.groupController.getGroup)
-      .post(this.verifyToken.check, this.role.levelOne, this.groupController.addNewGroup)
-      .put(this.groupController.updateGroup)
-      .delete(this.groupController.deleteGroup)
+    app.use('/api/v1/gruop', groupRoutes)
     //Fase 
-    app.route('/fase')
-      .get(this.faseController.getFase)
-      .post(this.faseController.addNewFase)
-      .put(this.faseController.updateFase)
-      .delete(this.faseController.deleteFase)
+    app.use('/api/v1/fase', faseRoutes)
     //Fase catalogue
-    app.route('/catFase')
-      .get(this.catFaseController.getCatFase)
-      .post(this.catFaseController.addNewCatFase)
-      .put(this.catFaseController.updateCatFase)
-      .delete(this.catFaseController.deleteCatFase)
+    app.use('/api/v1/catFase', catFaseRoutes)
     // Player
-    app.route('/player')
-      .get(this.playerController.getPlayer)
-      .post(this.verifyToken.check, this.role.levelThree, this.playerController.addNewPlayer)
-      .put(this.playerController.updatePlayer)
-      .delete(this.verifyToken.check, this.role.levelThree, this.playerController.deletePlayer)
-    app.route('/player/team')
-      .get(this.playerController.getByTeamID)
-    // Coach
-    app.route('/coach')
-      .get(this.verifyToken.check, this.role.levelTwo, this.role.getCoaches)
-      .post(this.role.createCoach)
-    //Manager
-    app.route('/manager')
-      .get(this.verifyToken.check, this.role.adminLevel, this.role.getManagers)
-    // Capturist
-    app.route('/capturist')
-      .get(this.verifyToken.check, this.role.levelOne, this.role.getCapturist)
+    app.use('/api/v1/player', playerRoutes)
+    // Role
+    app.use('/api/v1/role', roleRoutes)
     // Court
-    app.route('/court')
-      .get(this.courtController.getCourt)
-      .post(this.courtController.addNewCourt)
-      .delete(this.courtController.deleteCourt)
-      .put(this.courtController.updateCourt)
+    app.use('/api/v1/court', courtRoutes)
     // Match
-    app.route('/match')
-      .get(this.matchController.getMatch)
-      .post(this.verifyToken.check, this.role.levelTwo, this.matchController.addNewMatch)
-      .delete(this.verifyToken.check, this.role.levelOne, this.matchController.deleteMatch)
-      .put(this.matchController.updateMatch)
-    app.route('/match/schedules')
-      .get(this.matchController.getSchedule)
+    app.use('/api/v1/match', matchRoutes)
     // Referee
-    app.route('/referee')
-      .get(this.verifyToken.check, this.role.levelTwo, this.refereeController.getReferee)
-      .post(this.verifyToken.check, this.role.levelTwo, this.refereeController.addNewReferee)
-      .delete(this.verifyToken.check, this.role.levelOne, this.refereeController.deleteReferee)
-      .put(this.refereeController.updateReferee)
-    // Roles 
-    app.route('/role')
-      .post(this.verifyToken.check, this.role.levelOne, this.role.addUser)
-      .delete(this.verifyToken.check, this.role.levelOne, this.role.deleteUser)
-      .put(this.refereeController.updateReferee, this.role.levelOne, this.role.updateUser)
-    app.route('/role/auth')
-      .post(this.role.logIn)
-    app.route('/role/auth/logout')
-      .post(this.verifyToken.check, this.role.logOut)
+    app.use('/api/v1/referee', refereeRoutes)
+
   }
 }
