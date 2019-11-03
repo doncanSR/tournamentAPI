@@ -102,7 +102,6 @@ export class Schedules {
     await this.getTournamentInfo();
     let days = this.scheduler();
     this.matchUpdate();
-    this.printSchedule(days);
   }
   /**
    * createDays
@@ -256,7 +255,7 @@ export class Schedules {
 
   /**
    * @name ruleOne
-   * @description This rule verify that the matches are in the same time
+   * @description This rule verify that the matches are not in the same time
    * @param courts 
    * @param gMatch 
    * @param hour 
@@ -270,8 +269,8 @@ export class Schedules {
         continue;
       } else if (i !== court && courts[i].hours[hour].matchId) {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
-        if (gMatch.teamOne.toString() === teamsMatch[0].toString() || gMatch.teamTwo === teamsMatch[0].toString()
-          || gMatch.teamOne.toString() === teamsMatch[1].toString() || gMatch.teamTwo === teamsMatch[1].toString()) {
+        if (gMatch.teamOne.toString() === teamsMatch[0].toString() || gMatch.teamTwo.toString() === teamsMatch[0].toString()
+          || gMatch.teamOne.toString() === teamsMatch[1].toString() || gMatch.teamTwo.toString() === teamsMatch[1].toString()) {
           return false;
         }
       }
@@ -409,11 +408,4 @@ export class Schedules {
       await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
     });
   }
-
-  private printSchedule(days) {
-
-    console.log(this.matchesCreated);
-
-  }
-
 }
