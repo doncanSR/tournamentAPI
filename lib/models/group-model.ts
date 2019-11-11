@@ -10,10 +10,10 @@ export const groupSchema = new Schema({
     nameGroup: {
         type: String
     },
-    teamID: {
+    teamsId: {
         type: [String]
     },
-    tournamentID: {
+    tournamentId: {
         type: String,
         required: [true, 'TournamentId is needed']
     }

@@ -1,9 +1,9 @@
 
 import * as mongoose from 'mongoose';
-import { CourtSchema } from '../models/court-model';
+import { courtSchema } from '../models/court-model';
 import { Request, Response } from 'express';
 
-const Court = mongoose.model('Court', CourtSchema);
+const Court = mongoose.model('Court', courtSchema);
 
 export class CourtController {
   /**

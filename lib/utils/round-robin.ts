@@ -5,21 +5,29 @@ const Match = mongoose.model('Match', matchSchema);
 
 export class RoundRobin {
   teams: string[];
-  groupName: string;
+  groupId: string;
   rounds: number;
   tournmanetID: string;
-  constructor(teams: string[], groupName: string, tournmanetID: string) {
+  constructor(teams: string[], groupId: string, tournmanetID: string) {
     this.teams = teams;
-    this.groupName = groupName;
+    this.groupId = groupId;
     this.tournmanetID = tournmanetID;
   }
 
 
   private async addMatch() {
     let object = {
+      faseId: '',
+      refereeId: '',
+      setsTeamOne: '',
+      setsTeamTwo: '',
+      pointsTeamOne: '',
+      pointsTeamTwo: '',
+      dateMatch: '',
       teamOne: '',
       teamTwo: '',
-      groupName: this.groupName
+      tournamentId: '',
+      groupId: this.groupId
     };
     for (let i = 0; i < this.teams.length - 1; i++) {
         for(let j = i + 1; j < this.teams.length; j++){
@@ -39,7 +47,7 @@ export class RoundRobin {
   }
 
   private async saveMatch(object: any) {
-    object.tournamentID = this.tournmanetID;
+    object.tournamentId = this.tournmanetID;
     let newMatch = new Match(object);
     await newMatch.save();
   }

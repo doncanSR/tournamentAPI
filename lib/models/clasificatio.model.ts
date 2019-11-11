@@ -13,7 +13,7 @@ export const clasificationSchema = new Schema({
   level: {
     type: Number
   },
-  tournamentID: {
+  tournamentId: {
     type: String,
     required: [true, 'TournamentId is needed']
   }

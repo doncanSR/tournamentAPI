@@ -14,4 +14,6 @@ let matchRoutes = Router()
   .delete('/', verifyToken.check, role.levelOne, matchController.deleteMatch)
   .put('/', matchController.updateMatch)
 
+  .post('/register-match', matchController.registerMatch);
+
 export { matchRoutes }

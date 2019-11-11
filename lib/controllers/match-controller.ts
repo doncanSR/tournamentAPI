@@ -1,7 +1,9 @@
-
 import * as mongoose from 'mongoose';
 import { matchSchema } from '../models/match-model';
 import { Request, Response } from 'express';
+import { MatchDataInterface } from "../utils/interfaces/matchData-interface";
+import { AddPoints } from "../utils/addPoints"
+
 
 const Match = mongoose.model('Match', matchSchema);
 
@@ -104,5 +106,24 @@ export class MatchController {
       }
       res.status(200).json({ message: 'Successfully deleted match!' });
     });
+  }
+
+  public registerMatch(req: Request, res: Response) {
+    
+    let matchData : MatchDataInterface;
+    let addPoints = new AddPoints();
+    
+    matchData.pointsTO = parseInt(req.params.pointsTO);
+    matchData.pointsTT = parseInt(req.params.pointsTT);
+    matchData.setsTO = parseInt(req.params.setsTO);
+    matchData.setsTT = parseInt(req.params.setsTT);
+    matchData.teamOne = req.params.teamOne;
+    matchData.teamTwo = req.params.teamTwo;
+    matchData.tournamentId = req.params.tournamentId;
+
+    let theFinalTeam = addPoints.wasAdded(matchData);
+
+    
+
   }
 }

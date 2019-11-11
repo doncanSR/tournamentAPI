@@ -5,5 +5,5 @@ export interface MatchDataInterface {
     setsTT: number;
     pointsTO: number;
     pointsTT: number;
-    tournamentID: string;
+    tournamentId: string;
   }

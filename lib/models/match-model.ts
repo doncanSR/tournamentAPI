@@ -13,8 +13,8 @@ export const matchSchema = new Schema({
     teamTwo: {
         type: Schema.Types.ObjectId
     },
-    faseID: {
-        type: String
+    faseId: {
+        type: Schema.Types.ObjectId
     },
     court: {
         type: Schema.Types.ObjectId
@@ -22,26 +22,26 @@ export const matchSchema = new Schema({
     dateMatch: {
         type: Date
     },
-    pointTOne: {
+    pointsTeamOne: {
         type: Number
     },
-    pointTTwo: {
+    pointsTeamTwo: {
         type: Number
     },
-    groupName: {
-        type: String
+    groupId: {
+        type: Schema.Types.ObjectId
     },
-    setTOne: {
+    setsTeamOne: {
         type: Number
     },
-    setTTwo: {
+    setsTeamTwo: {
         type: Number
     },
     refereeId: {
         type: String
     },
-    tournamentID: {
-        type: String,
+    tournamentId: {
+        type: Schema.Types.ObjectId,
         required: [true, 'TournamentId is needed']
     }
 });

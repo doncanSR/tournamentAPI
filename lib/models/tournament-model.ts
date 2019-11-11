@@ -11,13 +11,13 @@ export const tournamentSchema = new Schema({
         type: String,
         required: 'Enter tournament name'
     },
-    starDate: {
+    startDate: {
         type: Date,
-         required: 'Enter starDate'
+         required: 'Enter startDate'
     },
-    EndDate: {
+    endDate: {
         type: Date,
-         required: 'Enter EndDate '
+         required: 'Enter endDate '
     },
     state: {
         type: String,
@@ -38,5 +38,9 @@ export const tournamentSchema = new Schema({
     hoursPerDay: {
         type: Number,
          required: 'Enter hoursPerDay '
+    },
+    matchTime: {
+        type: Number,
+        required: 'Enter matchType'
     },
 });

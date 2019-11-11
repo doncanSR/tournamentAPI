@@ -22,7 +22,7 @@ export const teamSchema = new Schema({
     points: {
         type: Number
     },
-    tournamentID: {
+    tournamentId: {
         type: String,
         required: [true, 'TournamentId is needed']
     }

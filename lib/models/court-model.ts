@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 
-export const CourtSchema = new Schema({
+export const courtSchema = new Schema({
   id: {
     type: Schema.Types.ObjectId
   },
@@ -19,7 +19,7 @@ export const CourtSchema = new Schema({
   dayHours: {
     type: [String]
   },
-  tournamentID: {
+  tournamentId: {
     type: String,
     required: [true, 'TournamentId is needed']
   }

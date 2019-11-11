@@ -19,12 +19,12 @@ export class PlayerController {
         res.send(err);
       }
       console.log('Player -->',player);
-      Player.count({ 'teamID': player.teamID }, (err, number) => {
+      Player.count({ 'teamId': player.teamId }, (err, number) => {
         if (err) {
           newTeam = {playersNo :0};
         }
         newTeam = {playersNo : number}
-        Team.findOneAndUpdate({ _id: player.teamID }, newTeam, { new: true }, (err, team) => {
+        Team.findOneAndUpdate({ _id: player.teamId }, newTeam, { new: true }, (err, team) => {
           if (err) {
             res.send(err);
           }
@@ -62,7 +62,7 @@ export class PlayerController {
    * getByTeamID
    */
   public getByTeamID(req: Request, res: Response) {
-    Player.find({ 'teamID': req.body.teamID }, (err, players) => {
+    Player.find({ 'teamId': req.body.teamId }, (err, players) => {
       if (err) {
         res.send({ error: { code: '404', message: 'user not found' } });
       }

@@ -22,10 +22,10 @@ export const playerSchema = new Schema({
     birthday: {
         type: Date
     },
-    teamID:{
+    teamId:{
         type: String
     },
-    tournamentID: {
+    tournamentId: {
         type: String,
         required: [true, 'TournamentId is needed']
     }

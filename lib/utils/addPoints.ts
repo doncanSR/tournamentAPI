@@ -1,8 +1,10 @@
 import { MatchDataInterface } from "./interfaces/matchData-interface";
 import { teamSchema } from "../models/team-model";
+import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 
 const Team = mongoose.model('Team', teamSchema);
+const Match = mongoose.model('Match', matchSchema);
 
 export class AddPoints implements MatchDataInterface {
     pointsTO: number;
@@ -22,12 +24,11 @@ export class AddPoints implements MatchDataInterface {
     setsTT: number;
     totalSetsTO: any;
     totalSetsTT: any;
-    tournamentID: string;
+    tournamentId: string;
     list: any;
     orderedList: any;
 
-    constructor(matches: number){
-        this.totalMatches = matches;
+    constructor(){
         this.matches = 0;
     }
 
@@ -83,7 +84,7 @@ export class AddPoints implements MatchDataInterface {
         this.setsTT = matchData.setsTT;
         this.totalPointsMatchTO = matchData.pointsTO;
         this.totalPointsMatchTT = matchData.pointsTT;
-        this.tournamentID = matchData.tournamentID;
+        this.tournamentId = matchData.tournamentId;
         
         return await this.updatePoints();
     }
@@ -105,10 +106,10 @@ export class AddPoints implements MatchDataInterface {
         });
     }
 
-    registredMatch(){
-        
+    async registredMatch(){
+        let matchesCreated = await Match.countDocuments({ 'tournamentId': this.tournamentId });
         this.matches++;
-        if (this.matches < this.totalMatches)
+        if (this.matches < matchesCreated)
             return false;    //Continue with the games
         else
             return true; //Throw the list
@@ -140,7 +141,7 @@ export class AddPoints implements MatchDataInterface {
       };
 
     async getList(){
-        this.list = await Team.find({ 'tournamentID': '5c6c8c4632600327ae2046c2'}, {});
+        this.list = await Team.find({ 'tournamentId': '5c6c8c4632600327ae2046c2'}, {});
         this.orderedList = this.bubbleSort(this.list);
         return this.orderedList;
     }
