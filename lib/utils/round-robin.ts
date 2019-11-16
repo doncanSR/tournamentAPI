@@ -1,38 +1,31 @@
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
 
+const ObjectId = require('mongodb').ObjectID
 const Match = mongoose.model('Match', matchSchema);
 
 export class RoundRobin {
   teams: string[];
-  groupId: string;
+  groupId: Object;
   rounds: number;
-  tournmanetID: string;
-  constructor(teams: string[], groupId: string, tournmanetID: string) {
+  tournamentID: string;
+  constructor(teams: string[], groupId: Object, tournamentID: string) {
     this.teams = teams;
     this.groupId = groupId;
-    this.tournmanetID = tournmanetID;
+    this.tournamentID = tournamentID;
   }
 
 
   private async addMatch() {
     let object = {
-      faseId: '',
-      refereeId: '',
-      setsTeamOne: '',
-      setsTeamTwo: '',
-      pointsTeamOne: '',
-      pointsTeamTwo: '',
-      dateMatch: '',
-      teamOne: '',
-      teamTwo: '',
-      tournamentId: '',
+      faseId: new ObjectId("5bd4c45b15bf9f0badb531e6"),
+      tournamentId: this.tournamentID,
       groupId: this.groupId
     };
     for (let i = 0; i < this.teams.length - 1; i++) {
         for(let j = i + 1; j < this.teams.length; j++){
-          object.teamOne = this.teams[i];
-          object.teamTwo = this.teams[j];
+          object['teamOne'] = this.teams[i];
+          object['teamTwo'] = this.teams[j];
           await this.saveMatch(object);
         }
     }
@@ -47,7 +40,7 @@ export class RoundRobin {
   }
 
   private async saveMatch(object: any) {
-    object.tournamentId = this.tournmanetID;
+    object.tournamentId = this.tournamentID;
     let newMatch = new Match(object);
     await newMatch.save();
   }

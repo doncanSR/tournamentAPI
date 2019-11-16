@@ -32,17 +32,17 @@ export class Schedules {
    * @description Get the info of the current tournament
    */
   public async getTournamentInfo() {
-    let tournament = await Tournament.find({ '_id': this.tournamentId });
+    let tournament = await Tournament.findOne({ '_id': this.tournamentId });
     let diffDays = 0;
     let allDays: string[] = [];
-    this.totalCourts = tournament[0].courts;
-    this.hoursPerDay = tournament[0].hoursPerDay;
-    this.matchTime = tournament[0].matchTime;
+    this.totalCourts = tournament.courts;
+    this.hoursPerDay = tournament.hoursPerDay;
+    this.matchTime = tournament.matchTime;
 
-    diffDays = tournament[0].endDate.getDate() - tournament[0].startDate.getDate();
+    diffDays = tournament.endDate.getDate() - tournament.startDate.getDate();
     for (let i = 0; i <= diffDays; i++) {
       let dToSave = new Date();
-      dToSave.setDate(tournament[0].startDate.getDate() + i)
+      dToSave.setDate(tournament.startDate.getDate() + i)
       allDays.push(dToSave.toISOString());
     }
     this.days = allDays;

@@ -68,12 +68,13 @@ export class Schedulefill {
   }
 
   private async createGroups() {
-    let object = { nameGroup: 0, tournamentId: this.tournamentId, teamId: [] };
+    let index;
+    let object = { nameGroup: 0, tournamentId: this.tournamentId, teamsId: [] };
 
-    for (let index = 0; index < this.groups; index++) {
+    for (index = 0; index < this.groups; index++) {
       await this.fillTeamPerGroup(this.teamsPerGroup);
       if (this.teamsId) {
-        object.teamId = this.teamsId;
+        object.teamsId = this.teamsId;
         object.nameGroup = (index + 1);
         await this.saveGroup(object);
         if (index === (this.groups - 1)) {
@@ -84,12 +85,13 @@ export class Schedulefill {
         break;
       };
     }
+    let indexGroups = index;
     if (this.excededGroups && this.groups === 0) {
-      for (let index = 0; index < this.excededGroups; index++) {
+      for (; index < this.excededGroups + indexGroups; index++) {
         await this.fillTeamPerGroup(this.teamsPerGruopExc);
         if (this.teamsId) {
-          object.teamId = this.teamsId;
-          object.nameGroup = await Team.find({ 'tournamentId': this.tournamentId }, 'nameGroup').sort({ date: -1 }).limit(1);
+          object.teamsId = this.teamsId;
+          object.nameGroup = (index + 1);//await Team.find({ 'tournamentId': this.tournamentId }, 'nameGroup').sort({ date: -1 }).limit(1);
           await this.saveGroup(object);
           this.teamsId = [];
         } else {
