@@ -5,9 +5,12 @@ import * as mongoose from 'mongoose';
 import * as constants from "../utils/tournamentConstants";
 
 const Transaction = require("mongoose-transactions");
+const assert = require('assert');
+const ObjectId = require('mongodb').ObjectID
 
 const Team = mongoose.model('Team', teamSchema);
 const Match = mongoose.model('Match', matchSchema);
+
 
 export class AddPoints implements MatchDataInterface {
     pointsTO: number;
@@ -28,8 +31,6 @@ export class AddPoints implements MatchDataInterface {
     totalSetsTO: any;
     totalSetsTT: any;
     tournamentId: Object;
-    list: any;
-    orderedList: any;
 
     constructor(tournamentId: Object){
 
@@ -40,7 +41,7 @@ export class AddPoints implements MatchDataInterface {
     async wasAdded(matchData: MatchDataInterface): Promise <{status: number, message: string}>{
         
         let inValid = await this.findPreviousMatch(matchData);
-        if (inValid) {
+        if (inValid && typeof inValid !== "object") {
             return {
                 status: 410,
                 message: inValid
@@ -56,7 +57,6 @@ export class AddPoints implements MatchDataInterface {
         this.tournamentId = matchData.tournamentId;
         this.matchId = matchData.matchId;
         
-
         return await this.updatePoints();
     }
 
@@ -69,7 +69,7 @@ export class AddPoints implements MatchDataInterface {
    */
 
   private async findPreviousMatch(matchData){
-    let valid = await Match.findById(matchData.matchId).then(match =>{
+    let valid = await Match.findById(matchData.matchId, (err, match) =>{
         if (match.pointsTeamOne || match.pointsTeamTwo 
             || match.setsTeamOne || match.setsTeamTwo){
         
@@ -146,8 +146,12 @@ export class AddPoints implements MatchDataInterface {
 
         const useDB = true;
         const transaction = new Transaction(useDB);
+        let result = {
+            status: constants.STATUS_OK,
+            message: constants.SUCCESSFUL_REGISTER
+        }
         
-        const team: string = 'Teamm';
+        const team: string = 'Team';
         const match: string = 'Match';
 
         try {
@@ -179,19 +183,40 @@ export class AddPoints implements MatchDataInterface {
             console.error(error);
             const rollbackObj = await transaction.rollback().catch(console.error);
             transaction.clean();
-            return  {
+            result = {
                 status: constants.ERROR_INTERNAL_SERVER,
                 message: constants.ERROR_REGISTER
             };
 
         }
 
-        return {
-            status: constants.STATUS_OK,
-            message: constants.SUCCESSFUL_REGISTER
-        };
+        return result;
 
     }
+
+    // private transactionMatch(){
+
+    //     let session = null;
+
+    //     let result = {
+    //         status: constants.ERROR_INTERNAL_SERVER,
+    //         message: constants.ERROR_REGISTER
+    //     };
+
+    //     async () => await Team.startSession().
+    //     then(async session => session.withTransaction(async () => {
+    //         return await Team.findOneAndUpdate({_id: this.teamOne},{
+    //             pointsTotal: this.totalPointsTO,
+    //             pointsClass: this.totalPointsClassTO,
+    //             sets: this.totalSetsTO
+    //         },{ session: session});
+    //     })).
+    //     then( async () => await Team.countDocuments()).
+    //     then(count => console.log(assert.strictEqual(count, 1)));
+        
+    //     return result;
+    // }
+
 
      /**
      * getList
@@ -199,14 +224,13 @@ export class AddPoints implements MatchDataInterface {
      * @returns a ordered list with the best teams, started with the best and finish with the 
      */
     async getList(){
-        this.list = await Team.findById(this.tournamentId, err => {
+        let list = await Team.find({tournamentId: this.tournamentId}, err => {
             return {
                 status: constants.ERROR_INTERNAL_SERVER,
                 message: constants.ERROR_QUERY
             }
         });
-        this.orderedList = this.bubbleSort(this.list);
-        return this.orderedList;
+        return await this.bubbleSort(list);
     }
 
     bubbleSort = arr => {

@@ -14,6 +14,7 @@ let matchRoutes = Router()
   .delete('/', verifyToken.check, role.levelOne, matchController.deleteMatch)
   .put('/', matchController.updateMatch)
 
-  .post('/register-match', matchController.registerMatch);
+  .post('/register-match', matchController.registerMatch)
+  .get('/get-teams-groups', matchController.getListOfBestTeams);
 
 export { matchRoutes }
