@@ -93,7 +93,7 @@ export class Roles {
       dateStarSession: date
     }
     role.findOneAndUpdate({ 'email': req.body.email }, user, { new: true }, (err, user) => {
-      if (err) {
+      if (err || !user) {
         res.status(404).send({ error: {code: '404', message:'user not found'}});
       }
       let passwordIsValid = (req.body.password === user.password) ? true : false;
