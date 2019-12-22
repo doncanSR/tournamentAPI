@@ -168,14 +168,14 @@ export class Schedules {
     //Create fase and matches
     let object = { teamId: finalListTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
     let newFase = new FaseSchema(object);
-    //let faseCreated = await newFase.save();
+    let faseCreated = await newFase.save();
     let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id.toString()' };
 
     for (let i = 0; i < finalListTeams.length / 2; i++) {
       objectMatch.teamOne = finalListTeams[i];
       objectMatch.teamTwo = finalListTeams[finalListTeams.length - i - 1];
       let newMatch = new Match(objectMatch);
-      //await newMatch.save();
+      await newMatch.save();
       this.matchesCreated++;
     }
   }
@@ -490,9 +490,9 @@ export class Schedules {
       dateMatch.setMinutes(0);
       dateMatch.setSeconds(0)
       matchToUpdate.dateMatch = dateMatch;
-      matchToUpdate._id = mongoose.Types.ObjectId(m.id);
-      matchToUpdate.court = m.courtId;
-      await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+      matchToUpdate._id = m.hour.matchId;
+      matchToUpdate.court = mongoose.Types.ObjectId(m.courtId);
+      let matchetUpaded = await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
     });
   }
 }

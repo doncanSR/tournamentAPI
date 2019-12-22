@@ -27,10 +27,10 @@ export class Keys {
   }
 
   public async getTournamentInfo() {
-    this.tournament = await Tournament.find({ '_id': this.tournamentId });
-    this.courts = this.tournament[0].courts;
-    this.hoursPerDay = this.tournament[0].hoursPerDay;
-    this.days = (this.tournament[0].endDate.getDate() - this.tournament[0].startDate.getDate() + 1);
+    this.tournament = await Tournament.findOne({ '_id': this.tournamentId });
+    this.courts = this.tournament.courts;
+    this.hoursPerDay = this.tournament.hoursPerDay;
+    this.days = (this.tournament.endDate.getDate() - this.tournament.startDate.getDate() + 1);
     this.distributeMatches();
   }
 
