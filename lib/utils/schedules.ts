@@ -12,7 +12,7 @@ const Tournament = mongoose.model('Tournament', tournamentSchema);
 const Court = mongoose.model('Court', courtSchema);
 
 export class Schedules {
-  tournamentId: string;
+  tournamentId: Object;
   totalCourts: number;
   courts: any;
   hoursPerDay: number;
@@ -23,8 +23,10 @@ export class Schedules {
   matchesCreated: any = [];
   maxGroup: any;
   asiggnedMatches: any;
+  matchesUpdated = 0;
 
-  constructor(tournamenId: string) {
+
+  constructor(tournamenId: Object) {
     this.tournamentId = tournamenId;
   }
   /**
@@ -491,8 +493,10 @@ export class Schedules {
       dateMatch.setSeconds(0)
       matchToUpdate.dateMatch = dateMatch;
       matchToUpdate._id = m.hour.matchId;
-      matchToUpdate.court = mongoose.Types.ObjectId(m.courtId);
-      let matchetUpaded = await Match.findOneAndUpdate({ _id: matchToUpdate._id }, matchToUpdate, { new: true });
+      matchToUpdate.court = m.courtId;
+      let matcheUpaded = await Match.findByIdAndUpdate(matchToUpdate._id, matchToUpdate, { new: true });
+      //console.log(matcheUpaded.toString() + " " + ++ this.matchesUpdated);
+      
     });
   }
 }

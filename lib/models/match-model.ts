@@ -38,7 +38,7 @@ export const matchSchema = new Schema({
         type: Number
     },
     refereeId: {
-        type: String
+        type: Schema.Types.ObjectId
     },
     tournamentId: {
         type: Schema.Types.ObjectId,

@@ -3,8 +3,6 @@ import { matchSchema } from '../models/match-model';
 import { Request, Response } from 'express';
 import { AddPoints } from "../utils/addPoints"
 
-const ObjectId = require('mongodb').ObjectID
-
 const Match = mongoose.model('Match', matchSchema);
 
 export class MatchController {
@@ -88,7 +86,7 @@ export class MatchController {
 
       let schedules = matches.map(match => {
         return {
-          matchId: match._id.toString(),
+          matchId: match._id,
           date: match.dateMatch,
           teamOne: match.team_one[0].name,
           teamTwo: match.team_two[0].name,
@@ -110,7 +108,7 @@ export class MatchController {
 
   public async registerMatch(req: Request, res: Response) {
 
-    let addPoints = new AddPoints(new ObjectId(req.body.tournamentId));
+    let addPoints = new AddPoints(new mongoose.Types.ObjectId(req.body.tournamentId));
     let added = await addPoints.wasAdded(req.body);
     console.log(added);
     res.status(added.status).json(added.message);
@@ -118,7 +116,7 @@ export class MatchController {
 
   public async getListOfBestTeams(req: Request, res: Response) {
 
-    let addPoints = new AddPoints(new ObjectId(req.query.tournamentId));
+    let addPoints = new AddPoints(new mongoose.Types.ObjectId(req.query.tournamentId));
     let list = await addPoints.getList()
     
     res.json(list);

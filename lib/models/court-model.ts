@@ -20,7 +20,7 @@ export const courtSchema = new Schema({
     type: [String]
   },
   tournamentId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: [true, 'TournamentId is needed']
   }
 });

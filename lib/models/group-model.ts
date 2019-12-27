@@ -11,10 +11,10 @@ export const groupSchema = new Schema({
         type: String
     },
     teamsId: {
-        type: [String]
+        type: [Schema.Types.ObjectId]
     },
     tournamentId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: [true, 'TournamentId is needed']
     }
 });

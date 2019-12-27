@@ -1,7 +1,7 @@
 import { matchSchema } from "../models/match-model";
 import * as mongoose from 'mongoose';
+import * as constants from "../utils/tournamentConstants";
 
-const ObjectId = require('mongodb').ObjectID
 const Match = mongoose.model('Match', matchSchema);
 
 export class RoundRobin {
@@ -18,7 +18,7 @@ export class RoundRobin {
 
   private async addMatch() {
     let object = {
-      faseId: new ObjectId("5bd4c45b15bf9f0badb531e6"),
+      faseId: new mongoose.Types.ObjectId(constants.GROUP_FASE_ID),
       tournamentId: this.tournamentID,
       groupId: this.groupId
     };

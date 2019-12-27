@@ -9,8 +9,8 @@ const Team = mongoose.model('Team', teamSchema);
 
 export class Finals {
   areTime: boolean;
-  tournamentId: string;
-  constructor(areTime: boolean, tournamentId: string) {
+  tournamentId: Object;
+  constructor(areTime: boolean, tournamentId: Object) {
     this.areTime = areTime;
     this.tournamentId = tournamentId;
   }
@@ -24,7 +24,7 @@ export class Finals {
   }
 
   private async createEighth() {
-    let object = { teamId: '', tournamentId: this.tournamentId, catFaseId: '5cb802fc3259cd048a783696' };
+    let object = { teamId: '', tournamentId: this.tournamentId, catFaseId: new mongoose.Types.ObjectId('5cb802fc3259cd048a783696') };
     let finalistTeams;
     // this.finalistTeams = await Team.find({ 'tournamentId': this.tournamentId }, '_id');
     finalistTeams = ['team1', 'team2', 'team3', 'team4', 'team5', 'team6', 'team7', 'team8', 'team9', 'team10', 'team11', 'team12', 'team13', 'team14', 'team15', 'team16'];

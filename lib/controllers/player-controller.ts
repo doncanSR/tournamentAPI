@@ -51,7 +51,7 @@ export class PlayerController {
    */
   public getPlayerWithId(req: Request, res: Response) {
     Player.findById(req.params.playerId, (err, player) => {
-      if (err) {
+      if (err || !player) {
         res.send(err);
       }
       res.status(200).json(player);
@@ -63,7 +63,7 @@ export class PlayerController {
    */
   public getByTeamID(req: Request, res: Response) {
     Player.find({ 'teamId': req.body.teamId }, (err, players) => {
-      if (err) {
+      if (err || !players) {
         res.send({ error: { code: '404', message: 'user not found' } });
       }
       res.status(200).json(players);

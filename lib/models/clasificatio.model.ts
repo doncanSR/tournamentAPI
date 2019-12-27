@@ -8,13 +8,13 @@ export const clasificationSchema = new Schema({
     type: Schema.Types.ObjectId
   },
   groupsId: {
-    type: [String]
+    type: [Schema.Types.ObjectId]
   },
   level: {
     type: Number
   },
   tournamentId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: [true, 'TournamentId is needed']
   }
 });

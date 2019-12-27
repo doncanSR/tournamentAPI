@@ -18,3 +18,6 @@ export const ERROR_REGISTER = 'There is an error in the register';
 
 // Successful Messages
 export const SUCCESSFUL_REGISTER = 'The register was successful';
+
+//Objects Id
+export const GROUP_FASE_ID = "5bd4c45b15bf9f0badb531e6";

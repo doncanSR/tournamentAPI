@@ -23,10 +23,10 @@ export const playerSchema = new Schema({
         type: Date
     },
     teamId:{
-        type: String
+        type: Schema.Types.ObjectId
     },
     tournamentId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: [true, 'TournamentId is needed']
     }
 });

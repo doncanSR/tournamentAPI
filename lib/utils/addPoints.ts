@@ -6,7 +6,6 @@ import * as constants from "../utils/tournamentConstants";
 
 const Transaction = require("mongoose-transactions");
 const assert = require('assert');
-const ObjectId = require('mongodb').ObjectID
 
 const Team = mongoose.model('Team', teamSchema);
 const Match = mongoose.model('Match', matchSchema);

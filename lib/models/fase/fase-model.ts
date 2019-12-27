@@ -7,13 +7,13 @@ export const faseSchema = new Schema({
         type: Schema.Types.ObjectId
     },
     teamsId: {
-        type: [String]
+        type: [Schema.Types.ObjectId]
     },
     catFaseId:{
-        type: String
+        type: Schema.Types.ObjectId
     }, 
     tournamentId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: [true, 'TournamentId is needed']
     }
 });

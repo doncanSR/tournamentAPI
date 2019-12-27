@@ -19,7 +19,7 @@ export class Schedulefill {
   teamsPerGruopExc: number;
   totalClasifications: number;
   allTeams: any;
-  tournamentId: string;
+  tournamentId: Object;
 
   constructor(scheduleData: ScheduleInterface) {
     this.teams = scheduleData.teams;
