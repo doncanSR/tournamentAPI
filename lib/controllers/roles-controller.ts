@@ -1,10 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { rolSchema } from "../models/role-model";
 
 
-const role = mongoose.model('role', rolSchema);
+const role = model('role', rolSchema);
 
 export class Roles {
 

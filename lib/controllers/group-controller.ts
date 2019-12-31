@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 import { groupSchema } from '../models/group-model';
 import { Request, Response } from 'express';
 
-const Group = mongoose.model('Group', groupSchema);
+const Group = model('Group', groupSchema);
 
 export class GroupController {
   /**

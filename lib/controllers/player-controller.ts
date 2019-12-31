@@ -1,11 +1,11 @@
 
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { playerSchema } from '../models/player-model';
 import { teamSchema } from "../models/team-model";
 import { Request, Response } from 'express';
 
-const Player = mongoose.model('Player', playerSchema);
-const Team = mongoose.model('Team', teamSchema);
+const Player = model('Player', playerSchema);
+const Team = model('Team', teamSchema);
 
 export class PlayerController {
   /**

@@ -1,7 +1,4 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const tournamentSchema = new Schema({
     name: {

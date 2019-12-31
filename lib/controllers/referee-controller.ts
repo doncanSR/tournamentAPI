@@ -1,9 +1,9 @@
 
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { refereeSchema } from '../models/referee-model';
 import { Request, Response } from 'express';
 
-const Referee = mongoose.model('Referee', refereeSchema);
+const Referee = model('Referee', refereeSchema);
 
 export class RefereeController {
   /**

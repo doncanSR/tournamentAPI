@@ -1,14 +1,14 @@
 import { MatchDataInterface } from "./interfaces/matchData-interface";
 import { teamSchema } from "../models/team-model";
 import { matchSchema } from "../models/match-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import * as constants from "../utils/tournamentConstants";
 
 const Transaction = require("mongoose-transactions");
 const assert = require('assert');
 
-const Team = mongoose.model('Team', teamSchema);
-const Match = mongoose.model('Match', matchSchema);
+const Team = model('Team', teamSchema);
+const Match = model('Match', matchSchema);
 
 
 export class AddPoints implements MatchDataInterface {

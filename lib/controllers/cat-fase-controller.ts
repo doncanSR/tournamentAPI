@@ -1,9 +1,9 @@
 
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { catFaseSchema } from '../models/fase/cat-fase-model';
 import { Request, Response } from 'express';
 
-const CatFase = mongoose.model('CatFase', catFaseSchema);
+const CatFase = model('CatFase', catFaseSchema);
 
 export class CatFaseController {
   /**

@@ -1,14 +1,14 @@
 import { ScheduleInterface } from "./interfaces/schedule-interface";
 import { teamSchema } from "../models/team-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { groupSchema } from "../models/group-model";
 import { clasificationSchema } from "../models/clasificatio.model";
 import { RoundRobin } from "./round-robin";
 import { Schedules } from "./schedules"
 
-const Team = mongoose.model('Team', teamSchema);
-const Group = mongoose.model('Group', groupSchema);
-const Classification = mongoose.model('Classification', clasificationSchema);
+const Team = model('Team', teamSchema);
+const Group = model('Group', groupSchema);
+const Classification = model('Classification', clasificationSchema);
 
 export class Schedulefill {
   teams: number;

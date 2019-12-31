@@ -1,15 +1,15 @@
 import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { groupSchema } from "../models/group-model";
 import { courtSchema } from "../models/court-model";
 import { faseSchema } from "../models/fase/fase-model";
 
-const Match = mongoose.model('Match', matchSchema);
-const FaseSchema = mongoose.model('FaseSchema', faseSchema);
-const Group = mongoose.model('Group', groupSchema);
-const Tournament = mongoose.model('Tournament', tournamentSchema);
-const Court = mongoose.model('Court', courtSchema);
+const Match = model('Match', matchSchema);
+const FaseSchema = model('FaseSchema', faseSchema);
+const Group = model('Group', groupSchema);
+const Tournament = model('Tournament', tournamentSchema);
+const Court = model('Court', courtSchema);
 
 export class Schedules {
   tournamentId: Object;

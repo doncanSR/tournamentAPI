@@ -1,12 +1,12 @@
 import { FinalSchedule} from "./interfaces/finalSchedule-interface";
 import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { faseSchema } from "../models/fase/fase-model";
 
-const FaseSchema = mongoose.model('FaseSchema', faseSchema);
-const Match = mongoose.model('Match', matchSchema);
-const Tournament = mongoose.model('Tournament', tournamentSchema);
+const FaseSchema = model('FaseSchema', faseSchema);
+const Match = model('Match', matchSchema);
+const Tournament = model('Tournament', tournamentSchema);
 
 export class Keys {
   tournamentId: string;

@@ -1,20 +1,17 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const clasificationSchema = new Schema({
   id: {
-    type: Schema.Types.ObjectId
+    type: ObjectId
   },
   groupsId: {
-    type: [Schema.Types.ObjectId]
+    type: [ObjectId]
   },
   level: {
     type: Number
   },
   tournamentId: {
-    type: Schema.Types.ObjectId,
+    type: ObjectId,
     required: [true, 'TournamentId is needed']
   }
 });

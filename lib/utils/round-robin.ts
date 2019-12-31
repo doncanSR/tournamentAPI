@@ -1,8 +1,8 @@
 import { matchSchema } from "../models/match-model";
-import * as mongoose from 'mongoose';
+import { model, ObjectId } from 'mongoose';
 import * as constants from "../utils/tournamentConstants";
 
-const Match = mongoose.model('Match', matchSchema);
+const Match = model('Match', matchSchema);
 
 export class RoundRobin {
   teams: string[];
@@ -18,7 +18,7 @@ export class RoundRobin {
 
   private async addMatch() {
     let object = {
-      faseId: new mongoose.Types.ObjectId(constants.GROUP_FASE_ID),
+      faseId: new ObjectId(constants.GROUP_FASE_ID),
       tournamentId: this.tournamentID,
       groupId: this.groupId
     };
