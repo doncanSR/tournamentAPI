@@ -1,9 +1,8 @@
-
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { faseSchema } from '../models/fase/fase-model';
 import { Request, Response } from 'express';
 
-const Fase = mongoose.model('Fase', faseSchema);
+const Fase = model('Fase', faseSchema);
 
 export class FaseController {
   /**

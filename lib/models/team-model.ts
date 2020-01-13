@@ -1,11 +1,8 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const teamSchema = new Schema({
     id: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     name: {
         type: String
@@ -14,7 +11,7 @@ export const teamSchema = new Schema({
         type: Number
     },
     coachId: {
-        type: String
+        type: ObjectId
     },
     from: {
         type: String
@@ -22,8 +19,17 @@ export const teamSchema = new Schema({
     points: {
         type: Number
     },
-    tournamentID: {
-        type: String,
+    pointsClass: {
+        type: Number
+    },
+    pointsTotal: {
+        type: Number
+    },
+    sets: {
+        type: Number
+    },
+    tournamentId: {
+        type: ObjectId,
         required: [true, 'TournamentId is needed']
     }
     //Arrego de torneos

@@ -1,11 +1,8 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const catFaseSchema = new Schema({
     id: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     name: {
         type: String

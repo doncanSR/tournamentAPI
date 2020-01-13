@@ -1,25 +1,25 @@
 import { ScheduleInterface } from "./interfaces/schedule-interface";
 import { teamSchema } from "../models/team-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { groupSchema } from "../models/group-model";
 import { clasificationSchema } from "../models/clasificatio.model";
 import { RoundRobin } from "./round-robin";
 import { Schedules } from "./schedules"
 
-const Team = mongoose.model('Team', teamSchema);
-const Group = mongoose.model('Group', groupSchema);
-const Classification = mongoose.model('Classification', clasificationSchema);
+const Team = model('Team', teamSchema);
+const Group = model('Group', groupSchema);
+const Classification = model('Classification', clasificationSchema);
 
 export class Schedulefill {
   teams: number;
-  teamsID: string[] = [];
+  teamsId: string[] = [];
   groups: number;
   excededGroups: number;
   teamsPerGroup: number;
   teamsPerGruopExc: number;
   totalClasifications: number;
   allTeams: any;
-  tournamentId: string;
+  tournamentId: Object;
 
   constructor(scheduleData: ScheduleInterface) {
     this.teams = scheduleData.teams;
@@ -43,11 +43,11 @@ export class Schedulefill {
     }
   }
   private async getTeams() {
-    this.allTeams = await Team.find({ 'tournamentID': this.tournamentId }, '_id');
+    this.allTeams = await Team.find({ 'tournamentId': this.tournamentId }, '_id');
   }
 
   private createClassifications(): void {
-    let object = { level: 0, tournamentID: this.tournamentId };
+    let object = { level: 0, tournamentId: this.tournamentId };
     //create groups per clasifications and check fase that it is 
     for (let index = 0; index < this.totalClasifications; index++) {
       object.level = index + 1;
@@ -68,30 +68,32 @@ export class Schedulefill {
   }
 
   private async createGroups() {
-    let object = { nameGroup: 0, tournamentID: this.tournamentId, teamID: [] };
+    let index;
+    let object = { nameGroup: 0, tournamentId: this.tournamentId, teamsId: [] };
 
-    for (let index = 0; index < this.groups; index++) {
+    for (index = 0; index < this.groups; index++) {
       await this.fillTeamPerGroup(this.teamsPerGroup);
-      if (this.teamsID) {
-        object.teamID = this.teamsID;
+      if (this.teamsId) {
+        object.teamsId = this.teamsId;
         object.nameGroup = (index + 1);
         await this.saveGroup(object);
         if (index === (this.groups - 1)) {
           this.groups = 0;
         }
-        this.teamsID = [];
+        this.teamsId = [];
       } else {
         break;
       };
     }
+    let indexGroups = index;
     if (this.excededGroups && this.groups === 0) {
-      for (let index = 0; index < this.excededGroups; index++) {
+      for (; index < this.excededGroups + indexGroups; index++) {
         await this.fillTeamPerGroup(this.teamsPerGruopExc);
-        if (this.teamsID) {
-          object.teamID = this.teamsID;
-          object.nameGroup = await Team.find({ 'tournamentID': this.tournamentId }, 'nameGroup').sort({ date: -1 }).limit(1);
+        if (this.teamsId) {
+          object.teamsId = this.teamsId;
+          object.nameGroup = (index + 1);//await Team.find({ 'tournamentId': this.tournamentId }, 'nameGroup').sort({ date: -1 }).limit(1);
           await this.saveGroup(object);
-          this.teamsID = [];
+          this.teamsId = [];
         } else {
           break;
         };
@@ -105,7 +107,7 @@ export class Schedulefill {
     let newGroup = new Group(object);
     let group;
     group = await newGroup.save();
-    let rr = new RoundRobin(group.teamID, group._id.toString(), group.tournamentID);
+    let rr = new RoundRobin(group.teamsId, group._id.toString(), group.tournamentId);
     await rr.init();
   }
   private async fillTeamPerGroup(teamsPerGroup: number) {
@@ -113,11 +115,11 @@ export class Schedulefill {
     if (this.allTeams && this.allTeams.length >= teamsPerGroup) {
       for (let i = 0; i < teamsPerGroup; i++) {
         numberRan = Math.floor(Math.random() * this.allTeams.length);
-        this.teamsID[i] = this.allTeams[numberRan]._id;
+        this.teamsId[i] = this.allTeams[numberRan]._id;
         this.allTeams.splice(numberRan, 1);
       }
     } else {
-      this.teamsID = null;
+      this.teamsId = null;
     }
   }
 

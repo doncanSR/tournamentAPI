@@ -1,11 +1,8 @@
-import * as mongoose from 'mongoose';
+import { Schema, ObjectId } from 'mongoose';
 
-const Schema = mongoose.Schema;
-
-
-export const CourtSchema = new Schema({
+export const courtSchema = new Schema({
   id: {
-    type: Schema.Types.ObjectId
+    type: ObjectId
   },
   name: {
     type: String
@@ -19,8 +16,8 @@ export const CourtSchema = new Schema({
   dayHours: {
     type: [String]
   },
-  tournamentID: {
-    type: String,
+  tournamentId: {
+    type: ObjectId,
     required: [true, 'TournamentId is needed']
   }
 });

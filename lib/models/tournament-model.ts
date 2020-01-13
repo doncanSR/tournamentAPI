@@ -1,23 +1,17 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const tournamentSchema = new Schema({
-    id: {
-        type: Schema.Types.ObjectId
-    },
     name: {
         type: String,
         required: 'Enter tournament name'
     },
-    starDate: {
+    startDate: {
         type: Date,
-         required: 'Enter starDate'
+         required: 'Enter startDate'
     },
-    EndDate: {
+    endDate: {
         type: Date,
-         required: 'Enter EndDate '
+         required: 'Enter endDate '
     },
     state: {
         type: String,
@@ -38,5 +32,9 @@ export const tournamentSchema = new Schema({
     hoursPerDay: {
         type: Number,
          required: 'Enter hoursPerDay '
+    },
+    matchTime: {
+        type: Number,
+        required: 'Enter matchType'
     },
 });

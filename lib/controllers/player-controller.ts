@@ -1,11 +1,11 @@
 
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { playerSchema } from '../models/player-model';
 import { teamSchema } from "../models/team-model";
 import { Request, Response } from 'express';
 
-const Player = mongoose.model('Player', playerSchema);
-const Team = mongoose.model('Team', teamSchema);
+const Player = model('Player', playerSchema);
+const Team = model('Team', teamSchema);
 
 export class PlayerController {
   /**
@@ -19,12 +19,12 @@ export class PlayerController {
         res.send(err);
       }
       console.log('Player -->',player);
-      Player.count({ 'teamID': player.teamID }, (err, number) => {
+      Player.count({ 'teamId': player.teamId }, (err, number) => {
         if (err) {
           newTeam = {playersNo :0};
         }
         newTeam = {playersNo : number}
-        Team.findOneAndUpdate({ _id: player.teamID }, newTeam, { new: true }, (err, team) => {
+        Team.findOneAndUpdate({ _id: player.teamId }, newTeam, { new: true }, (err, team) => {
           if (err) {
             res.send(err);
           }
@@ -51,7 +51,7 @@ export class PlayerController {
    */
   public getPlayerWithId(req: Request, res: Response) {
     Player.findById(req.params.playerId, (err, player) => {
-      if (err) {
+      if (err || !player) {
         res.send(err);
       }
       res.status(200).json(player);
@@ -62,8 +62,8 @@ export class PlayerController {
    * getByTeamID
    */
   public getByTeamID(req: Request, res: Response) {
-    Player.find({ 'teamID': req.body.teamID }, (err, players) => {
-      if (err) {
+    Player.find({ 'teamId': req.body.teamId }, (err, players) => {
+      if (err || !players) {
         res.send({ error: { code: '404', message: 'user not found' } });
       }
       res.status(200).json(players);

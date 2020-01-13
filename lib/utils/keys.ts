@@ -1,12 +1,12 @@
 import { FinalSchedule} from "./interfaces/finalSchedule-interface";
 import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { faseSchema } from "../models/fase/fase-model";
 
-const FaseSchema = mongoose.model('FaseSchema', faseSchema);
-const Match = mongoose.model('Match', matchSchema);
-const Tournament = mongoose.model('Tournament', tournamentSchema);
+const FaseSchema = model('FaseSchema', faseSchema);
+const Match = model('Match', matchSchema);
+const Tournament = model('Tournament', tournamentSchema);
 
 export class Keys {
   tournamentId: string;
@@ -27,10 +27,10 @@ export class Keys {
   }
 
   public async getTournamentInfo() {
-    this.tournament = await Tournament.find({ '_id': this.tournamentId });
-    this.courts = this.tournament[0].courts;
-    this.hoursPerDay = this.tournament[0].hoursPerDay;
-    this.days = (this.tournament[0].EndDate.getDate() - this.tournament[0].starDate.getDate() + 1);
+    this.tournament = await Tournament.findOne({ '_id': this.tournamentId });
+    this.courts = this.tournament.courts;
+    this.hoursPerDay = this.tournament.hoursPerDay;
+    this.days = (this.tournament.endDate.getDate() - this.tournament.startDate.getDate() + 1);
     this.distributeMatches();
   }
 
@@ -38,7 +38,7 @@ export class Keys {
     let posibleMatches: number;
     this.matchesPerDay = (this.hoursPerDay / this.matchTime) * (this.courts);
     this.allPosibleMatches = this.matchesPerDay * this.days;
-    this.matchesCreated = await Match.countDocuments({ 'tournamentID': this.tournamentId });
+    this.matchesCreated = await Match.countDocuments({ 'tournamentId': this.tournamentId });
 
 
     //Refactor
@@ -107,10 +107,10 @@ export class Keys {
 
   private async createFaseMatch(finalistTeams, catFaseId){
     //Create fase and matches
-    let object = { teamId: finalistTeams, tournamentID: this.tournamentId, catFaseId: catFaseId };
+    let object = { teamId: finalistTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
     let newFase = new FaseSchema(object);
     //let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentID: this.tournamentId, faseID: 'faseCreated._id.toString()' };
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id.toString()' };
 
     for (let i = 0; i < finalistTeams.length / 2; i++) {
       objectMatch.teamOne = finalistTeams[i];

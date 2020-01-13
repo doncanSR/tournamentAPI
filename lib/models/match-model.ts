@@ -1,47 +1,44 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const matchSchema = new Schema({
     id: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     teamOne: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     teamTwo: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
-    faseID: {
-        type: String
+    faseId: {
+        type: ObjectId
     },
     court: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     dateMatch: {
         type: Date
     },
-    pointTOne: {
+    pointsTeamOne: {
         type: Number
     },
-    pointTTwo: {
+    pointsTeamTwo: {
         type: Number
     },
-    groupName: {
-        type: String
+    groupId: {
+        type: ObjectId
     },
-    setTOne: {
+    setsTeamOne: {
         type: Number
     },
-    setTTwo: {
+    setsTeamTwo: {
         type: Number
     },
     refereeId: {
-        type: String
+        type: ObjectId
     },
-    tournamentID: {
-        type: String,
+    tournamentId: {
+        type: ObjectId,
         required: [true, 'TournamentId is needed']
     }
 });

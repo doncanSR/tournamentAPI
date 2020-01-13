@@ -1,11 +1,8 @@
-
-import * as mongoose from 'mongoose';
-
-const Schema = mongoose.Schema;
+import { Schema, ObjectId } from 'mongoose';
 
 export const refereeSchema = new Schema({
     id: {
-        type: Schema.Types.ObjectId
+        type: ObjectId
     },
     name: {
         type: String
@@ -16,8 +13,8 @@ export const refereeSchema = new Schema({
     association: {
         type: String
     },
-    tournamentID: {
-        type: String,
+    tournamentId: {
+        type: ObjectId,
         required: [true, 'TournamentId is needed']
     }
 })
