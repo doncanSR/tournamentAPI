@@ -18,8 +18,8 @@ app.listen(PORT, () => {
 	// let fillSchedules = new Schedulefill(scheduleData);
 	// fillSchedules.fill();
 	
-	// let schedule = new Schedules('5bb975f97ccc872a398cfc25');
-	// schedule.scheduleInit();
+	let schedule = new Schedules('5bb975f97ccc872a398cfc25');
+	schedule.scheduleInit();
 	// let finals = new Finals(false, '5c6c8c4632600327ae2046c2');
 	// finals.areThereTime();
 
