@@ -1,5 +1,5 @@
 
-import * as mongoose from 'mongoose';
+import { model } from 'mongoose';
 import { groupSchema } from '../models/group-model';
 import { Request, Response } from 'express';
 
