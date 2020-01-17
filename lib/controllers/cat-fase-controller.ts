@@ -1,4 +1,3 @@
-
 import { model } from 'mongoose';
 import { catFaseSchema } from '../models/fase/cat-fase-model';
 import { Request, Response } from 'express';
@@ -7,7 +6,7 @@ const CatFase = model('CatFase', catFaseSchema);
 
 export class CatFaseController {
   /**
-  * addNewTeam    */
+   * addNewTeam    */
   public addNewCatFase(req: Request, res: Response) {
     let newCatFase = new CatFase(req.body);
 
@@ -16,17 +15,16 @@ export class CatFaseController {
         res.send(err);
       }
       res.status(200).json(catFase);
-    })
+    });
   }
   /**
    * getTeam  */
   public getCatFase(req: Request, res: Response) {
     CatFase.find({}, (err, catFase) => {
       if (err) {
-
       }
       res.status(200).json(catFase);
-    })
+    });
   }
 
   /**
@@ -38,16 +36,21 @@ export class CatFaseController {
         res.send(err);
       }
       res.status(200).json(catFase);
-    })
+    });
   }
 
   public updateCatFase(req: Request, res: Response) {
-    CatFase.findOneAndUpdate({ _id: req.query.catFaseId }, req.body, { new: true }, (err, catFase) => {
-      if (err) {
-        res.send(err);
+    CatFase.findOneAndUpdate(
+      { _id: req.query.catFaseId },
+      req.body,
+      { new: true },
+      (err, catFase) => {
+        if (err) {
+          res.send(err);
+        }
+        res.status(200).json(catFase);
       }
-      res.status(200).json(catFase);
-    });
+    );
   }
 
   public deleteCatFase(req: Request, res: Response) {

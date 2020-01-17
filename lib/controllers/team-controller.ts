@@ -1,4 +1,3 @@
-
 import { model } from 'mongoose';
 import { teamSchema } from '../models/team-model';
 import { Request, Response } from 'express';
@@ -7,7 +6,7 @@ const Team = model('Team', teamSchema);
 
 export class TeamController {
   /**
-  * addNewTeam    */
+   * addNewTeam    */
   public addNewTeam(req: Request, res: Response) {
     let newTeam = new Team(req.body);
 
@@ -16,17 +15,16 @@ export class TeamController {
         res.send(err);
       }
       res.status(200).json(team);
-    })
+    });
   }
   /**
    * getTeam  */
   public getTeam(req: Request, res: Response) {
     Team.find({}, (err, teams) => {
       if (err) {
-
       }
       res.status(200).json(teams);
-    })
+    });
   }
 
   /**
@@ -38,16 +36,21 @@ export class TeamController {
         res.send(err);
       }
       res.status(200).json(team);
-    })
+    });
   }
 
   public updateTeam(req: Request, res: Response) {
-    Team.findOneAndUpdate({ _id: req.query.teamId }, req.body, { new: true }, (err, team) => {
-      if (err) {
-        res.send(err);
+    Team.findOneAndUpdate(
+      { _id: req.query.teamId },
+      req.body,
+      { new: true },
+      (err, team) => {
+        if (err) {
+          res.send(err);
+        }
+        res.status(200).json(team);
       }
-      res.status(200).json(team);
-    });
+    );
   }
 
   public deleteTeam(req: Request, res: Response) {
