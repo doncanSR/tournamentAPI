@@ -21,6 +21,11 @@ app.listen(PORT, async () => {
 	let schedule = new Schedules('5bb975f97ccc872a398cfc25');
 	await schedule.scheduleInit();
 	
+<<<<<<< HEAD
+=======
+	let schedule = new Schedules('5bb975f97ccc872a398cfc25');
+	schedule.scheduleInit();
+>>>>>>> 1e5559343792118f2f09cfe8593af241b20818be
 	// let finals = new Finals(false, '5c6c8c4632600327ae2046c2');
 	// finals.areThereTime();
 
