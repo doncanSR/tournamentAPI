@@ -110,7 +110,7 @@ export class Keys {
     let object = { teamId: finalistTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
     let newFase = new FaseSchema(object);
     //let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id.toString()' };
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id' };
 
     for (let i = 0; i < finalistTeams.length / 2; i++) {
       objectMatch.teamOne = finalistTeams[i];

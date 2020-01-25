@@ -18,7 +18,7 @@ export class RoundRobin {
 
   private async addMatch() {
     let object = {
-      faseId: new ObjectId(constants.GROUP_FASE_ID),
+      faseId: constants.GROUP_FASE_ID,
       tournamentId: this.tournamentID,
       groupId: this.groupId
     };

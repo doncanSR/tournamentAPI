@@ -171,7 +171,7 @@ export class Schedules {
     let object = { teamId: finalListTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
     let newFase = new FaseSchema(object);
     let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id.toString()' };
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id' };
 
     for (let i = 0; i < finalListTeams.length / 2; i++) {
       objectMatch.teamOne = finalListTeams[i];
@@ -321,7 +321,7 @@ export class Schedules {
   */
   private updateHistoryId(m, courtId, hour, day) {
     for (const match of this.matchesCreated) {
-      if (match.id.toString() === m.id.toString()) {
+      if (match.id === m.id) {
         match.historicId = m.historicId
         match.courtId = courtId, 
         match.hour = hour,
@@ -358,8 +358,8 @@ export class Schedules {
         continue;
       } else if (i !== court && courts[i].hours[hour].matchId) {
         let teamsMatch = this.getTeamsFromMatch(courts[i].hours[hour].matchId);
-        if (gMatch.teamOne.toString() === teamsMatch[0].toString() || gMatch.teamTwo.toString() === teamsMatch[0].toString()
-          || gMatch.teamOne.toString() === teamsMatch[1].toString() || gMatch.teamTwo.toString() === teamsMatch[1].toString()) {
+        if (gMatch.teamOne === teamsMatch[0] || gMatch.teamTwo === teamsMatch[0]
+          || gMatch.teamOne === teamsMatch[1] || gMatch.teamTwo === teamsMatch[1]) {
           return false;
         }
       }
@@ -383,10 +383,10 @@ export class Schedules {
           continue;
         } else {
           let teamsMatch = this.getTeamsFromMatch(courts[j].hours[i].matchId);
-          if (gMatch.teamOne.toString() === teamsMatch[0] || gMatch.teamOne.toString() === teamsMatch[1].toString()) {
+          if (gMatch.teamOne === teamsMatch[0] || gMatch.teamOne === teamsMatch[1]) {
             teamOne++;
           }
-          if (gMatch.teamTwo.toString() === teamsMatch[0].toString() || gMatch.teamTwo.toString() === teamsMatch[1].toString()) {
+          if (gMatch.teamTwo === teamsMatch[0] || gMatch.teamTwo === teamsMatch[1]) {
             teamTwo++;
           }
         }
@@ -425,7 +425,7 @@ export class Schedules {
       courts.forEach(court => {
         if (court.hours[h + 1] && court.hours[h + 1].matchId != '') {
           let teamsMatch = this.getTeamsFromMatch(court.hours[h + 1].matchId);
-          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
             aux = this.countTimesDown(courts, teamId, h + 1, times, aux);
           }
         }
@@ -442,7 +442,7 @@ export class Schedules {
       courts.forEach(court => {
         if (court.hours[h - 1] && court.hours[h - 1].matchId && court.hours[h - 1].matchId != '') {
           let teamsMatch = this.getTeamsFromMatch(court.hours[h - 1].matchId);
-          if (teamId.toString() === teamsMatch[0].toString() || teamId.toString() === teamsMatch[1].toString()) {
+          if (teamId === teamsMatch[0] || teamId === teamsMatch[1]) {
             aux = this.countTimesUp(courts, teamId, h - 1, times, aux);
           }
         }
@@ -465,7 +465,7 @@ export class Schedules {
       return teams;
     }
     for (const match of this.matchesCreated) {
-      if (match.id.toString() === matchId.toString()) {
+      if (match.id === matchId) {
         teams.push(match.teamOne);
         teams.push(match.teamTwo);
       }
@@ -495,7 +495,7 @@ export class Schedules {
       matchToUpdate._id = m.hour.matchId;
       matchToUpdate.court = m.courtId;
       let matcheUpaded = await Match.findByIdAndUpdate(matchToUpdate._id, matchToUpdate, { new: true });
-      //console.log(matcheUpaded.toString() + " " + ++ this.matchesUpdated);
+      //console.log(matcheUpaded() + " " + ++ this.matchesUpdated);
       
     });
   }
