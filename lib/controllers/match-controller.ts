@@ -1,4 +1,4 @@
-import { model, ObjectId } from 'mongoose';
+import { model, ObjectId, Types } from 'mongoose';
 import { matchSchema } from '../models/match-model';
 import { Request, Response } from 'express';
 import { AddPoints } from "../utils/addPoints"
@@ -97,6 +97,20 @@ export class MatchController {
     })
   }
 
+  /**
+   * getScheduleByDate
+   */
+  public getScheduleByDate(req: Request, res: Response) {
+    Match.find({ tournamentId:  Types.ObjectId(req.params.tournamenId), dateMatch: { $gte: new Date(req.params.date) } }, (err, matches) => {
+      if (err) {
+        res.status(404).json(err);
+      }
+      console.log('These are the params ==> ', req.params);
+
+      res.status(200).json(matches);
+    });
+  }
+
   public deleteMatch(req: Request, res: Response) {
     Match.remove({ _id: req.params.matchId }, (err, match) => {
       if (err) {
@@ -118,7 +132,7 @@ export class MatchController {
 
     let addPoints = new AddPoints(new ObjectId(req.query.tournamentId));
     let list = await addPoints.getList()
-    
+
     res.json(list);
 
   }

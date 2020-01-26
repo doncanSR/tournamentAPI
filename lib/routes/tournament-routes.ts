@@ -12,5 +12,6 @@ const tournamentRoutes = Router()
   .post('/', verifyToken.check, role.levelOne, tournamentController.addNewTournament)
   .delete('/', verifyToken.check, role.adminLevel, tournamentController.deleteTournament)
   .put('/', tournamentController.updateTournament)
+  .get('/tournamentTime/:tournamnentId', tournamentController.getTournamnetTime)
 
 export { tournamentRoutes }
