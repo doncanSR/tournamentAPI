@@ -56,7 +56,7 @@ export class TournamentController {
    * getTournamnetTime
 req: Request, res:Response   */
   public getTournamnetTime(req: Request, res:Response) {
-    Tournament.find({_id: Types.ObjectId(req.params.tournamenId)}, {starDate: 1, EndDate: 1}, (err, tournament) => {
+    Tournament.find({_id: Types.ObjectId(req.params.tournamentId)}, {starDate: 1, EndDate: 1}, (err, tournament) => {
       if(err){ res.status(404).json(err)};
       res.status(200).json(tournament);
     });
