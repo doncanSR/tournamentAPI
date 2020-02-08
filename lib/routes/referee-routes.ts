@@ -8,7 +8,7 @@ const verifyToken: VerifyToken = new VerifyToken();
 const refereeController: RefereeController = new RefereeController();
 const refereeRoutes = Router()
 
-  .get('/', verifyToken.check, role.levelTwo, refereeController.getReferee)
+  .get('/', refereeController.getReferee)
   .post('/', verifyToken.check, role.levelTwo, refereeController.addNewReferee)
   .delete('/', verifyToken.check, role.levelOne, refereeController.deleteReferee)
   .put('/', refereeController.updateReferee)

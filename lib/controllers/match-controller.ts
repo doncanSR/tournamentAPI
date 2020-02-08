@@ -142,7 +142,8 @@ export class MatchController {
           idTeamOne: match.team_one[0]._id,
           teamOne: match.team_one[0].name,
           idTwoOne: match.team_two[0]._id,
-          teamTwo: match.team_two[0].name
+          teamTwo: match.team_two[0].name,
+          faseId: match.faseId
         }
       });
       res.status(200).json(teams);
