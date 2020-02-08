@@ -1,9 +1,11 @@
-import { model, ObjectId } from 'mongoose';
+import { model, ObjectId, Types } from 'mongoose';
 import { matchSchema } from '../models/match-model';
 import { Request, Response } from 'express';
 import { AddPoints } from "../utils/addPoints"
+import { teamSchema } from '../models/team-model';
 
 const Match = model('Match', matchSchema);
+const Teams = model('Teams', teamSchema)
 
 export class MatchController {
   /**
@@ -97,6 +99,57 @@ export class MatchController {
     })
   }
 
+  /**
+   * getScheduleByDate
+   */
+  public getScheduleByDate(req: Request, res: Response) {
+    Match.aggregate([
+      {
+        $lookup: {
+          from: "teams",
+          localField: "teamOne",
+          foreignField: "_id",
+          as: "team_one"
+        }
+      },
+      {
+        $lookup: {
+          from: "teams",
+          localField: "teamTwo",
+          foreignField: "_id",
+          as: "team_two"
+        }
+      },
+      {
+        $match: {
+          $and: [
+            {
+              "dateMatch": {
+                "$gte": new Date(req.params.date)
+              }
+            }, {
+              "tournamentId": Types.ObjectId(req.params.tournamenId)
+            }]
+        }
+      }
+    ]).sort({ dateMatch: 1 }).exec((err, matches) => {
+      if (err) {
+        res.status(404).json(err);
+      }
+      let teams = matches.map(match => {
+        return {
+          matchId: match._id,
+          idTeamOne: match.team_one[0]._id,
+          teamOne: match.team_one[0].name,
+          idTwoOne: match.team_two[0]._id,
+          teamTwo: match.team_two[0].name,
+          faseId: match.faseId
+        }
+      });
+      res.status(200).json(teams);
+    })
+  }
+
   public deleteMatch(req: Request, res: Response) {
     Match.remove({ _id: req.params.matchId }, (err, match) => {
       if (err) {
@@ -118,7 +171,7 @@ export class MatchController {
 
     let addPoints = new AddPoints(new ObjectId(req.query.tournamentId));
     let list = await addPoints.getList()
-    
+
     res.json(list);
 
   }
