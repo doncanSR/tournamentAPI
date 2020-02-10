@@ -1,4 +1,4 @@
-import { model, ObjectId } from 'mongoose';
+import { model, Types } from 'mongoose';
 import { matchSchema } from '../models/match-model';
 import { Request, Response } from 'express';
 import { AddPoints } from '../utils/addPoints';
@@ -61,7 +61,7 @@ export class MatchController {
     Match.aggregate([
       {
         $match: {
-          tournamentId: ObjectId(req.params)
+          tournamentId: Types.ObjectId(req.query.tournamentId)
         }
       },
       {
@@ -118,14 +118,14 @@ export class MatchController {
   }
 
   public async registerMatch(req: Request, res: Response) {
-    let addPoints = new AddPoints(new ObjectId(req.body.tournamentId));
+    let addPoints = new AddPoints(Types.ObjectId(req.body.tournamentId));
     let added = await addPoints.wasAdded(req.body);
     console.log(added);
     res.status(added.status).json(added.message);
   }
 
   public async getListOfBestTeams(req: Request, res: Response) {
-    let addPoints = new AddPoints(new ObjectId(req.query.tournamentId));
+    let addPoints = new AddPoints(Types.ObjectId(req.query.tournamentId));
     let list = await addPoints.getList();
 
     res.json(list);
