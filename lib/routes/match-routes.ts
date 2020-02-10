@@ -9,6 +9,7 @@ let verifyToken: VerifyToken = new VerifyToken();
 let matchRoutes = Router()
 
   .get('/schedules', matchController.getSchedule)
+  .get('/schedulesByDate/:date/:tournamenId', matchController.getScheduleByDate)
   .get('/', matchController.getMatch)
   .post('/', verifyToken.check, role.levelTwo, matchController.addNewMatch)
   .delete('/', verifyToken.check, role.levelOne, matchController.deleteMatch)
