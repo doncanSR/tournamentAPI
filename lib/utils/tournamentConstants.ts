@@ -1,6 +1,7 @@
 // Generic Codes
 export const STATUS_OK = 200;
 export const BAD_REQUEST = 400;
+export const CREATED = 201;
 
 // Error Codes
 export const ERROR_FAILED_AUTHENTICATION_TOKEN = 401;
@@ -15,9 +16,11 @@ export const ERROR_GENERIC = 10;
 // Error Messages
 export const ERROR_QUERY = 'There is an error in the query';
 export const ERROR_REGISTER = 'There is an error in the register';
+export const ERROR_ENOUGH_TIME = 'There is not enough time';
 
 // Successful Messages
 export const SUCCESSFUL_REGISTER = 'The register was successful';
+export const SUCCESSFUL_OPERATION = 'The operation has done';
 
 //Objects Id
 export const GROUP_FASE_ID = '5bd4c45b15bf9f0badb531e6';

@@ -1,7 +1,14 @@
 import { model, Types } from 'mongoose';
 import { tournamentSchema } from '../models/tournament-model';
 import { Request, Response } from 'express';
+import { CreateSchedule } from "../utils/create-schedules";
+import { ScheduleInterface } from "../utils/interfaces/schedule-interface";
+import { teamSchema } from '../models/team-model';
+import { Schedulefill } from "../utils/schedules-fill";
+import { Schedules } from "../utils/schedules";
+import * as constants from "../utils/tournamentConstants";
 
+const Team = model('Team', teamSchema);
 const Tournament = model('Tournament', tournamentSchema);
 
 export class TournamentController {
@@ -55,11 +62,34 @@ export class TournamentController {
   /**
    * getTournamnetTime
 req: Request, res:Response   */
-  public getTournamnetTime(req: Request, res:Response) {
+  public getTournamentTime(req: Request, res:Response) {
     Tournament.find({_id: Types.ObjectId(req.params.tournamentId)}, {starDate: 1, EndDate: 1}, (err, tournament) => {
       if(err){ res.status(404).json(err)};
       res.status(200).json(tournament);
     });
   }
+
+  public async initTournament(req: Request, res:Response){
+    let numberTeams = await Team.count({tournamentId: req.body.tournamentId},(err, count)=>{
+      if(err){ res.status(constants.ERROR_NOT_FOUND).json(err)};
+      return count;
+    });
+    let schedule:ScheduleInterface = new CreateSchedule(numberTeams, req.body.tournamentId);
+    let isCorrect: boolean = schedule.verifyTeams();
+    let fillSchedules = new Schedulefill(schedule);
+    isCorrect ? await fillSchedules.fill() : res.status(constants.ERROR_INTERNAL_SERVER).json({message: constants.ERROR_ENOUGH_TIME});
+    res.status(constants.STATUS_OK).json({message: constants.SUCCESSFUL_OPERATION});
+
+  }
+
+  public async doTheRole(req: Request, res:Response){
+
+    let schedules = new Schedules(req.body.tournamentId);
+    await schedules.scheduleInit();
+    res.status(constants.STATUS_OK).json({message: constants.SUCCESSFUL_OPERATION});
+
+  }
+
+
 
 }

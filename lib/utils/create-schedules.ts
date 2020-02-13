@@ -1,5 +1,5 @@
 import { ScheduleInterface } from "./interfaces/schedule-interface";
-export class createSchedule implements ScheduleInterface {
+export class CreateSchedule implements ScheduleInterface {
   teams: number;
   groups: number;
   clasification: number;

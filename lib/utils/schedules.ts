@@ -191,6 +191,7 @@ export class Schedules {
     await this.getTournamentInfo();
     let days = this.scheduler();
     this.matchUpdate();
+    return true;
   }
   /**
    * createDays
