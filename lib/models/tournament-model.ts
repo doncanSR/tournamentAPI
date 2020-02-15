@@ -5,11 +5,11 @@ export const tournamentSchema = new Schema({
         type: String,
         required: 'Enter tournament name'
     },
-    starDate: {
+    startDate: {
         type: Date,
          required: 'Enter startDate'
     },
-    EndDate: {
+    endDate: {
         type: Date,
          required: 'Enter endDate '
     },
