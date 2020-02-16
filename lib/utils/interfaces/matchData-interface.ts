@@ -7,4 +7,5 @@ export interface MatchDataInterface {
     pointsTT: number;
     matchId: Object;
     tournamentId: Object;
+    refereeId: Object;
   }

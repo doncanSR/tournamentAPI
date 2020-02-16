@@ -30,6 +30,7 @@ export class AddPoints implements MatchDataInterface {
     totalSetsTO: any;
     totalSetsTT: any;
     tournamentId: Object;
+    refereeId: Object;
 
     constructor(tournamentId: Object){
 
@@ -55,6 +56,7 @@ export class AddPoints implements MatchDataInterface {
         this.totalPointsMatchTT = matchData.pointsTT;
         this.tournamentId = matchData.tournamentId;
         this.matchId = matchData.matchId;
+        this.refereeId = matchData.refereeId;
         
         return await this.updatePoints();
     }
@@ -171,7 +173,8 @@ export class AddPoints implements MatchDataInterface {
                 pointsTeamOne: this.totalPointsMatchTO,
                 pointsTeamTwo: this.totalPointsMatchTT,
                 setsTeamOne: this.setsTO,
-                setsTeamTwo: this.setsTT
+                setsTeamTwo: this.setsTT,
+                refereeId: this.refereeId
             },{new: true});
 
             const final = await transaction.run();
