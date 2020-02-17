@@ -13,6 +13,8 @@ const tournamentRoutes = Router()
   .delete('/', verifyToken.check, role.adminLevel, tournamentController.deleteTournament)
   .put('/', tournamentController.updateTournament)
   .get('/tournamentTime/:tournamentId', tournamentController.getTournamentTime)
-  .post('/init', tournamentController.initTournament)
+  .post('/init-groups', tournamentController.initGroups)
   .post('/do-the-role', tournamentController.doTheRole)
+  .post('/init', tournamentController.initTournament)
+  
 export { tournamentRoutes }

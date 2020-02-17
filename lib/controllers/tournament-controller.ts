@@ -69,7 +69,7 @@ req: Request, res:Response   */
     });
   }
 
-  public async initTournament(req: Request, res:Response){
+  public async initGroups(req: Request, res:Response){
     let numberTeams = await Team.count({tournamentId: req.body.tournamentId},(err, count)=>{
       if(err){ res.status(constants.ERROR_NOT_FOUND).json(err)};
       return count;
@@ -77,8 +77,12 @@ req: Request, res:Response   */
     let schedule:ScheduleInterface = new CreateSchedule(numberTeams, req.body.tournamentId);
     let isCorrect: boolean = schedule.verifyTeams();
     let fillSchedules = new Schedulefill(schedule);
-    isCorrect ? await fillSchedules.fill() : res.status(constants.ERROR_INTERNAL_SERVER).json({message: constants.ERROR_ENOUGH_TIME});
-    res.status(constants.STATUS_OK).json({message: constants.SUCCESSFUL_OPERATION});
+    if (isCorrect) {
+      await fillSchedules.fill();
+      res.status(constants.STATUS_OK).json({message: constants.SUCCESSFUL_OPERATION});
+    }else{
+      res.status(constants.ERROR_INTERNAL_SERVER).json({message: constants.ERROR_ENOUGH_TIME});
+    }
 
   }
 
@@ -90,6 +94,27 @@ req: Request, res:Response   */
 
   }
 
+  public async initTournament(req: Request, res:Response){
+
+    let numberTeams = await Team.count({tournamentId: req.body.tournamentId},(err, count)=>{
+      if(err){ res.status(constants.ERROR_NOT_FOUND).json(err)};
+      return count;
+    });
+
+    let schedule:ScheduleInterface = new CreateSchedule(numberTeams, req.body.tournamentId);
+    let isCorrect: boolean = schedule.verifyTeams();
+    let fillSchedules = new Schedulefill(schedule);
+
+    if (isCorrect) {
+      await fillSchedules.fill();
+      let schedules = new Schedules(req.body.tournamentId);
+      await schedules.scheduleInit();
+      res.status(constants.STATUS_OK).json({message: constants.SUCCESSFUL_OPERATION});
+    }else{
+      res.status(constants.ERROR_INTERNAL_SERVER).json({message: constants.ERROR_ENOUGH_TIME});
+    }
+    
+  }
 
 
 }
