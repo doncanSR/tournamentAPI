@@ -2,9 +2,9 @@ import { FinalSchedule} from "./interfaces/finalSchedule-interface";
 import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
 import { model } from 'mongoose';
-import { faseSchema } from "../models/fase/fase-model";
+import { phaseSchema } from "../models/phase/phase-model";
 
-const FaseSchema = model('FaseSchema', faseSchema);
+const PhaseSchema = model('PhaseSchema', phaseSchema);
 const Match = model('Match', matchSchema);
 const Tournament = model('Tournament', tournamentSchema);
 
@@ -68,27 +68,27 @@ export class Keys {
   }
   
   private async createKeys(round: string) {
-    let catFaseId;
+    let catPhaseId;
     let finalistTeams: string[];
     switch (round) {
       case 'eighth':
-        catFaseId = '5ccbcf0c07863277340026f9';
+        catPhaseId = '5ccbcf0c07863277340026f9';
         finalistTeams = this.createList(16);
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+        await this.createPhaseMatch(finalistTeams, catPhaseId); 
       
       case 'quarters':
-        catFaseId = '5ccbcf0c07863277340026fa';
+        catPhaseId = '5ccbcf0c07863277340026fa';
         finalistTeams = this.createList(8);
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+        await this.createPhaseMatch(finalistTeams, catPhaseId); 
 
       case 'semifinal':
-        catFaseId = '5ccbcf0c07863277340026fb';
+        catPhaseId = '5ccbcf0c07863277340026fb';
         finalistTeams = this.createList(4);      
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+        await this.createPhaseMatch(finalistTeams, catPhaseId); 
       
       case 'final':
-        catFaseId = '5ccbcf0c07863277340026fc';
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+        catPhaseId = '5ccbcf0c07863277340026fc';
+        await this.createPhaseMatch(finalistTeams, catPhaseId); 
       break;
 
       default:
@@ -105,12 +105,12 @@ export class Keys {
     return listTeam;
   }
 
-  private async createFaseMatch(finalistTeams, catFaseId){
-    //Create fase and matches
-    let object = { teamId: finalistTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
-    let newFase = new FaseSchema(object);
-    //let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id' };
+  private async createPhaseMatch(finalistTeams, catPhaseId){
+    //Create phase and matches
+    let object = { teamId: finalistTeams, tournamentId: this.tournamentId, catPhaseId: catPhaseId };
+    let newPhase = new PhaseSchema(object);
+    //let phaseCreated = await newPhase.save();
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: 'phaseCreated._id' };
 
     for (let i = 0; i < finalistTeams.length / 2; i++) {
       objectMatch.teamOne = finalistTeams[i];

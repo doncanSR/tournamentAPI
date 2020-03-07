@@ -1,14 +1,21 @@
 import { MatchDataInterface } from "./interfaces/matchData-interface";
 import { teamSchema } from "../models/team-model";
 import { matchSchema } from "../models/match-model";
-import { model } from 'mongoose';
+import { phaseSchema } from "../models/phase/phase-model";
+import { tournamentSchema } from "../models/tournament-model";
+import { model, Types } from 'mongoose';
 import * as constants from "../utils/tournamentConstants";
+import { tournamentRoutes } from "routes/tournament-routes";
+import { Schedules } from "./schedules";
+import { PhaseController } from "controllers/phase-controller";
 
 const Transaction = require("mongoose-transactions");
 const assert = require('assert');
 
 const Team = model('Team', teamSchema);
 const Match = model('Match', matchSchema);
+const Tournament = model('Tournament', tournamentSchema);
+const Phase = model('Phase', phaseSchema);
 
 
 export class AddPoints implements MatchDataInterface {
@@ -225,8 +232,8 @@ export class AddPoints implements MatchDataInterface {
      * @description do the list of the best teams
      * @returns a ordered list with the best teams, started with the best and finish with the 
      */
-    async getList(){
-        let list = await Team.find({tournamentId: this.tournamentId}, err => {
+    async getList(phaseId){
+        let list = await Team.find({tournamentId: this.tournamentId, phaseId: phaseId}, err => {
             return {
                 status: constants.ERROR_INTERNAL_SERVER,
                 message: constants.ERROR_QUERY
@@ -258,6 +265,57 @@ export class AddPoints implements MatchDataInterface {
             }
         }
         return arr;
-      };
-    
+    };
+     /**
+     * finishGroupPhase
+     * @description when the groups phase finish, the next phase and the matches will be created and
+     * teams and tournament will be updated
+     * @returns  
+     */
+    public async finishGroupPhase(){
+
+        let tournament = await Tournament.findById(this.tournamentId);
+        let numberOfPhases = tournament.numberOfPhases;
+        let listTeams = await this.getList(this.tournamentId);
+        let bestTeams = listTeams.splice(Math.pow(2,numberOfPhases));
+        let phaseId; 
+        switch(numberOfPhases - 1){
+            case 5:
+                phaseId = constants.SIXTEENTHS_PHASE_ID;
+                break;
+            case 4:
+                phaseId = constants.EIGHTHS_PHASE_ID;
+                break;
+            case 3:
+                phaseId = constants.QUARTERS_PHASE_ID;
+                break;
+            case 2:
+                phaseId = constants.SEMIFINAL_PHASE_ID;
+                break;
+            case 1:
+                phaseId = constants.FINAL_PHASE_ID;
+                break;
+        }
+
+        this.createMatches(bestTeams, phaseId);
+
+    }
+     /**
+     * createMatches
+     * @description do the list of the best teams
+     * @returns a ordered list with the best teams, started with the best and finish with the 
+     */
+    private createMatches(bestTeams, phaseId){
+        let schedule = new Schedules(this.tournamentId);
+        schedule.createPhaseMatch(bestTeams, Types.ObjectId(phaseId));
+        
+    }
+     /**
+     * updateTeams
+     * @description do the list of the best teams
+     * @returns a ordered list with the best teams, started with the best and finish with the 
+     */
+    private updateTeams(){
+
+    }
 }

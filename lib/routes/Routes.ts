@@ -1,9 +1,9 @@
 // Core 
 import { Request, Response } from "express";
 // Routes
-import { faseRoutes } from "./fase-routes";
+import { phaseRoutes } from "./phase-routes";
 import { tournamentRoutes } from "./tournament-routes";
-import { catFaseRoutes } from "./cat-fase-routes";
+import { catPhaseRoutes } from "./cat-phase-routes";
 import { playerRoutes } from "./player-routes";
 import { teamRoutes } from "./team-routes";
 import { groupRoutes } from "./group-routes";
@@ -27,10 +27,10 @@ export class Routes {
     app.use('/api/v1/teams', teamRoutes)
     //Group
     app.use('/api/v1/gruop', groupRoutes)
-    //Fase 
-    app.use('/api/v1/fase', faseRoutes)
-    //Fase catalogue
-    app.use('/api/v1/catFase', catFaseRoutes)
+    //Phase 
+    app.use('/api/v1/phase', phaseRoutes)
+    //Phase catalogue
+    app.use('/api/v1/catPhase', catPhaseRoutes)
     // Player
     app.use('/api/v1/player', playerRoutes)
     // Role

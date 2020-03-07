@@ -1,13 +1,13 @@
 import { Schema, ObjectId } from 'mongoose';
 
-export const faseSchema = new Schema({
+export const phaseSchema = new Schema({
     id: {
         type: ObjectId
     },
     teamsId: {
         type: [ObjectId]
     },
-    catFaseId:{
+    catPhaseId:{
         type: ObjectId
     }, 
     tournamentId: {

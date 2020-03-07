@@ -37,4 +37,10 @@ export const tournamentSchema = new Schema({
         type: Number,
         required: 'Enter matchType'
     },
+    numberOfPhases: {
+        type: Number
+    },
+    phase: {
+        type: Number
+    },
 });

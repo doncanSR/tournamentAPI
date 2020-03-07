@@ -1,9 +1,9 @@
 import { model, Types } from 'mongoose';
 import { teamSchema } from "../models/team-model";
-import { faseSchema } from "../models/fase/fase-model";
+import { phaseSchema } from "../models/phase/phase-model";
 import { matchSchema } from "../models/match-model";
 
-const FaseSchema = model('FaseSchema', faseSchema);
+const PhaseSchema = model('PhaseSchema', phaseSchema);
 const Match = model('Match', matchSchema);
 const Team = model('Team', teamSchema);
 
@@ -24,16 +24,16 @@ export class Finals {
   }
 
   private async createEighth() {
-    let object = { teamId: '', tournamentId: this.tournamentId, catFaseId: Types.ObjectId('5cb802fc3259cd048a783696') };
+    let object = { teamId: '', tournamentId: this.tournamentId, catPhaseId: Types.ObjectId('5cb802fc3259cd048a783696') };
     let finalistTeams;
     // this.finalistTeams = await Team.find({ 'tournamentId': this.tournamentId }, '_id');
     finalistTeams = ['team1', 'team2', 'team3', 'team4', 'team5', 'team6', 'team7', 'team8', 'team9', 'team10', 'team11', 'team12', 'team13', 'team14', 'team15', 'team16'];
     object.teamId = finalistTeams;
-    let newFase = new FaseSchema(object);
-    let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' };
+    let newPhase = new PhaseSchema(object);
+    let phaseCreated = await newPhase.save();
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' };
     let last = finalistTeams.length;
-    objectMatch.faseId = faseCreated._id;
+    objectMatch.phaseId = phaseCreated._id;
     for (let i = 0; i < (last / 2); i++) {
       objectMatch.teamOne = finalistTeams[i];
       objectMatch.teamTwo = finalistTeams[last - (i + 1)];
@@ -44,13 +44,13 @@ export class Finals {
   }
 
   private async createQuarter() {
-    let objectMatchEven = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' };
-    let objectMatchOdd = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' };
-    let objectFase = { teamId: [], tournamentId: this.tournamentId, catFaseId: '5bd4c46815bf9f0badb531e7' };
+    let objectMatchEven = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' };
+    let objectMatchOdd = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' };
+    let objectPhase = { teamId: [], tournamentId: this.tournamentId, catPhaseId: '5bd4c46815bf9f0badb531e7' };
     let finalistTeams;
     let even: string[] = [];
     let odd: string[] = [];
-    finalistTeams = await Match.find({ 'faseId': '5cb821b9662e921b9b83c073' });
+    finalistTeams = await Match.find({ 'phaseId': '5cb821b9662e921b9b83c073' });
     for (let i = 0; i < finalistTeams.length; i++) {
       if (((finalistTeams.length - i) % 2) === 0) {
 
@@ -69,12 +69,12 @@ export class Finals {
         }
       }
     }
-    objectFase.teamId = even;
-    objectFase.teamId = objectFase.teamId.concat(odd);
-    let newFase = new FaseSchema(objectFase);
-    let faseCreated = await newFase.save();
-    objectMatchEven.faseId = faseCreated._id;
-    objectMatchOdd.faseId = faseCreated._id;
+    objectPhase.teamId = even;
+    objectPhase.teamId = objectPhase.teamId.concat(odd);
+    let newPhase = new PhaseSchema(objectPhase);
+    let phaseCreated = await newPhase.save();
+    objectMatchEven.phaseId = phaseCreated._id;
+    objectMatchOdd.phaseId = phaseCreated._id;
     for (let k = 0; k <= 1; k++) {
       objectMatchEven.teamOne = even[k];
       objectMatchEven.teamTwo = even[k + 1];
@@ -97,11 +97,11 @@ export class Finals {
     }
   }
 
-  private async createSemis() {
+  private async createSemifinal() {
     let finalistTeams;
     let semifinalist: string[] = [];
 
-    finalistTeams = await Match.find({ 'faseId': '5cb8f1af7512b120e13b3ac9' });
+    finalistTeams = await Match.find({ 'phaseId': '5cb8f1af7512b120e13b3ac9' });
     for (let i = 0; i < finalistTeams.length; i++) {
 
       if (finalistTeams[i].setsTeamOne > finalistTeams[i].teamTwo) {
@@ -111,11 +111,11 @@ export class Finals {
 
       }
     }
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' }
-    let objectFase = { teamId: semifinalist, tournamentId: this.tournamentId, catFaseId: '5bd4c46815bf9f0badb531e9' }
-    let newFase = new FaseSchema(objectFase);
-    let faseCreated = await newFase.save();
-    objectMatch.faseId = faseCreated._id;
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' }
+    let objectPhase = { teamId: semifinalist, tournamentId: this.tournamentId, catPhaseId: '5bd4c46815bf9f0badb531e9' }
+    let newPhase = new PhaseSchema(objectPhase);
+    let phaseCreated = await newPhase.save();
+    objectMatch.phaseId = phaseCreated._id;
     for (let k = 0; k <= 1; k++) {
       objectMatch.teamOne = semifinalist[k];
       objectMatch.teamTwo = semifinalist[k + 1];
@@ -133,7 +133,7 @@ export class Finals {
     let finalistTeams;
     let finalTeams: string[] = [];
     let losersTeam: string[] = [];
-    finalistTeams = await Match.find({ 'faseId': '5cbcf12ff5525a0a74a74e38' });
+    finalistTeams = await Match.find({ 'phaseId': '5cbcf12ff5525a0a74a74e38' });
     for (let i = 0; i < finalistTeams.length; i++) {
       if (finalistTeams[i].setsTeamOne > finalistTeams[i].setsTeamTwo) {
         finalTeams.push(finalistTeams[i].teamOne);
@@ -146,17 +146,17 @@ export class Finals {
     }
     console.log('This is the winner teams ', finalTeams);
     console.log('This is the loser teams ', losersTeam);
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' };
-    let objectMatchThird = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: '' };
-    let objectFase = { teamId: finalTeams, tournamentId: this.tournamentId, catFaseId: '5bd4c48715bf9f0badb531ea' };
-    let objectFaseTwo = { teamId: losersTeam, tournamentId: this.tournamentId, catFaseId: '5bd4c49015bf9f0badb531eb' };
-    let newFase = new FaseSchema(objectFase);
-    let champion = await newFase.save();
-    let newFaseTwo = new FaseSchema(objectFaseTwo);
-    let faseThird = await newFaseTwo.save();
+    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' };
+    let objectMatchThird = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, phaseId: '' };
+    let objectPhase = { teamId: finalTeams, tournamentId: this.tournamentId, catPhaseId: '5bd4c48715bf9f0badb531ea' };
+    let objectPhaseTwo = { teamId: losersTeam, tournamentId: this.tournamentId, catPhaseId: '5bd4c49015bf9f0badb531eb' };
+    let newPhase = new PhaseSchema(objectPhase);
+    let champion = await newPhase.save();
+    let newPhaseTwo = new PhaseSchema(objectPhaseTwo);
+    let phaseThird = await newPhaseTwo.save();
 
-    objectMatch.faseId = champion._id;
-    objectMatchThird.faseId = faseThird._id;
+    objectMatch.phaseId = champion._id;
+    objectMatchThird.phaseId = phaseThird._id;
     objectMatch.teamOne = finalTeams[0];
     objectMatch.teamTwo = finalTeams[1];
     objectMatchThird.teamOne = losersTeam[0];

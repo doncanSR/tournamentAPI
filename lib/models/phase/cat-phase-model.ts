@@ -1,6 +1,6 @@
 import { Schema, ObjectId } from 'mongoose';
 
-export const catFaseSchema = new Schema({
+export const catPhaseSchema = new Schema({
     id: {
         type: ObjectId
     },

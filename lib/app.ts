@@ -2,12 +2,14 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Routes } from "./routes/Routes";
 import * as mongoose from "mongoose";
-import * as corns from "cors"
+import * as corns from "cors";
+
 
 class App {
     public app: express.Application;
     public routerPrv: Routes = new Routes();
-    public mongoUrl: string = 'mongodb://localhost/tournamentDB';
+    public mongoUrl: string = 'mongodb+srv://Doncan:doncandoncan@tournamentdb-ffc2r.mongodb.net/test?retryWrites=true&w=majority';
+    //public mongoUrl: string = 'mongodb://localhost/tournamentDB';
 
     constructor() {
         this.app = express();

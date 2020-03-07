@@ -10,7 +10,7 @@ export const matchSchema = new Schema({
     teamTwo: {
         type: ObjectId
     },
-    faseId: {
+    phaseId: {
         type: ObjectId
     },
     court: {

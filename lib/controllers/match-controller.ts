@@ -152,7 +152,7 @@ export class MatchController {
           teamOne: match.team_one[0].name,
           idTwoOne: match.team_two[0]._id,
           teamTwo: match.team_two[0].name,
-          faseId: match.faseId
+          phaseId: match.phaseId
         }
       });
       res.status(200).json(teams);
@@ -177,7 +177,7 @@ export class MatchController {
 
   public async getListOfBestTeams(req: Request, res: Response) {
     let addPoints = new AddPoints(Types.ObjectId(req.query.tournamentId));
-    let list = await addPoints.getList();
-    res.json(list);
+    //let list = await addPoints.getList();
+    //res.json(list);
   }
 }

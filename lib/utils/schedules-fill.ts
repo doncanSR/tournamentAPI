@@ -48,7 +48,7 @@ export class Schedulefill {
 
   private createClassifications(): void {
     let object = { level: 0, tournamentId: this.tournamentId };
-    //create groups per clasifications and check fase that it is 
+    //create groups per clasifications and check phase that it is 
     for (let index = 0; index < this.totalClasifications; index++) {
       object.level = index + 1;
       let newClassification = new Classification(object)
@@ -68,7 +68,7 @@ export class Schedulefill {
   }
 
   private async createGroups() {
-    let index;
+    let index;  
     let object = { nameGroup: 0, tournamentId: this.tournamentId, teamsId: [] };
 
     for (index = 0; index < this.groups; index++) {

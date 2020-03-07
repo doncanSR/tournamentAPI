@@ -11,11 +11,11 @@ export class CourtController {
   public addNewCourt(req: Request, res: Response) {
     let newCourt = new Court(req.body);
 
-    newCourt.save((err, fase) => {
+    newCourt.save((err, phase) => {
       if (err) {
         res.send(err);
       }
-      res.status(200).json(fase);
+      res.status(200).json(phase);
     })
   }
   /**
@@ -30,7 +30,7 @@ export class CourtController {
   }
 
   /**
-   * getFaseWithId
+   * getPhaseWithId
    */
   public getCourtWithId(req: Request, res: Response) {
     Court.findById(req.params.courtId, (err, court) => {

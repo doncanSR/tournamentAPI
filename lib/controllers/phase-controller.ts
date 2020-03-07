@@ -5,6 +5,7 @@ import { matchSchema } from '../models/match-model';
 import * as constants from "../utils/tournamentConstants";
 import { AddPoints } from '../utils/addPoints';
 import { teamSchema } from '../models/team-model';
+import { Schedules } from 'utils/schedules';
 
 const Phase = model('Phase', phaseSchema);
 const Match = model('Match', matchSchema)
@@ -66,7 +67,8 @@ export class PhaseController {
 
   public async finishGroupsPhase(req: Request, res: Response) {
 
-    Match.find({tournamentId: req.body.tournamentId, phaseId: constants.GROUPS_PHASE_ID}, (err, matches) => {
+    let incompleteMatches = [];
+    await Match.find({tournamentId: req.body.tournamentId}, (err, matches) => {
       if (err) {
         res.send(err);
       }
@@ -74,19 +76,18 @@ export class PhaseController {
       matches.forEach(match => {
         if(!match.pointsTeamOne || !match.pointsTeamTwo || !match.refereeId || 
            !match.setsTeamOne || !match.setsTeamTwo){
-            res.status(503).json({message: constants.ERROR_INCOMPLETE_PHASE})
-            return;
+            incompleteMatches.push(match);
         }
       });
     });
 
+    if(incompleteMatches.length > 0){
+      res.status(503).json({message: constants.ERROR_INCOMPLETE_PHASE, incompletematch: incompleteMatches});
+      return;
+    }
+
     let addPoints = new AddPoints(Types.ObjectId(req.body.tournamentId));
-
-    // if(addPoints.finishGroupPhase()){
-    //   res.send();
-    // }
-
-    res.send();
+    addPoints.finishGroupPhase();
 
   }
 }

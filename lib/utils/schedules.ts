@@ -1,12 +1,15 @@
 import { tournamentSchema } from "../models/tournament-model";
 import { matchSchema } from "../models/match-model";
-import { model } from 'mongoose';
+import { model, Types } from 'mongoose';
 import { groupSchema } from "../models/group-model";
 import { courtSchema } from "../models/court-model";
-import { faseSchema } from "../models/fase/fase-model";
+import { phaseSchema } from "../models/phase/phase-model";
+import * as constants from "../utils/tournamentConstants";
+import { tournamentRoutes } from "routes/tournament-routes";
+
 
 const Match = model('Match', matchSchema);
-const FaseSchema = model('FaseSchema', faseSchema);
+const PhaseSchema = model('PhaseSchema', phaseSchema);
 const Group = model('Group', groupSchema);
 const Tournament = model('Tournament', tournamentSchema);
 const Court = model('Court', courtSchema);
@@ -24,6 +27,7 @@ export class Schedules {
   maxGroup: any;
   asiggnedMatches: any;
   matchesUpdated = 0;
+  numberOfPhases: number;
 
 
   constructor(tournamenId: Object) {
@@ -40,6 +44,7 @@ export class Schedules {
     this.totalCourts = tournament.courts;
     this.hoursPerDay = tournament.hoursPerDay;
     this.matchTime = tournament.matchTime;
+    this.numberOfPhases = tournament.numberOfPhases;
 
     diffDays = tournament.endDate.getDate() - tournament.startDate.getDate();
     for (let i = 0; i <= diffDays; i++) {
@@ -77,109 +82,122 @@ export class Schedules {
    * @returns return false if the matches can't be
    */
 
-  private async distributeMatches() {
+  private async distributeMatches(numberOfPhases: number) {
 
     //Get the values to do the keys
     let posibleMatches: number;
     this.matchesPerDay = (this.hoursPerDay / this.matchTime) * (this.courts);
     this.allPosibleMatches = this.matchesPerDay * this.days.length;
     this.matchesCreated = await Match.countDocuments({ 'tournamentId': this.tournamentId });
+    return this.checkTime(numberOfPhases);
 
-
-    //Ask if the matches can be created
-    posibleMatches = this.matchesCreated + 16;
-    if (this.matchesCreated && posibleMatches < this.allPosibleMatches) {
-      //There are time for 8th
-      this.createKeys('eighth');
-    } else {
-      posibleMatches = this.matchesCreated + 8;
-      if (this.matchesCreated && posibleMatches < this.allPosibleMatches){
-        //There are  time for 4th
-        this.createKeys('quarters');
-      }else{
-        posibleMatches = this.matchesCreated + 4;
-        if (this.matchesCreated && posibleMatches < this.allPosibleMatches) {
-          //There are  time for semis
-          this.createKeys('semifinal')
-        }else{
-          //There are not sufficient time
-          return false;
-        }
-      }
+  }
+   /**
+   * @name matchesPerNumberPhases
+   * @description calcute the total of matches that the teams need
+   * @param phases
+   */
+  private matchesPerNumberPhases (phases){
+    let matches = 0;
+    for (let index = phases; index < 3; index--) {
+      matches += Math.pow(2, index);
     }
+    return matches;
+  }
+   /**
+   * @name checkTime
+   * @description check if the time is enough to complete the tournament
+   * @param numberOfPhases
+   */
+  private checkTime(numberOfPhases){
+
+    if (numberOfPhases < 3) {
+      return false;
+    }
+    if((this.matchesCreated + this.matchesPerNumberPhases(numberOfPhases)) < this.allPosibleMatches){
+      return this.createKeys(numberOfPhases, null);
+    }else{
+      return this.checkTime(numberOfPhases - 1);
+    }
+   
   }
   /**
    * @name createKeys
    * @description this method create the keys
    * @param round
    */
-  private async createKeys(round: string) {
-    let catFaseId;
+  public async createKeys(bestTeams:[], phases: number) {
+    let catPhaseId;
     let finalistTeams: string[];
-    switch (round) {
-      //Create fase of eighth with 16 teams which are not real
-      case 'eighth':
-        catFaseId = '5ccbcf0c07863277340026f9';
-        finalistTeams = this.createList(16);
-        await this.createFaseMatch(finalistTeams, catFaseId);
+    switch (phases) {
+      //Create phase of eighth with 32 teams which are not real
+      case 5:
+        catPhaseId = Types.ObjectId(constants.SIXTEENTHS_PHASE_ID);
+        await this.createPhaseMatch(finalistTeams, catPhaseId);
+      break;
 
-      //Create fase of quartes with 8 teams wtich are not real      
-      case 'quarters':
-        catFaseId = '5ccbcf0c07863277340026fa';
-        finalistTeams = this.createList(8);
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+      //Create phase of eighth with 16 teams which are not real
+      case 4:
+        catPhaseId = Types.ObjectId(constants.EIGHTHS_PHASE_ID);
+        await this.createPhaseMatch(finalistTeams, catPhaseId);
+      break;
+
+      //Create phase of quartes with 8 teams wtich are not real      
+      case 3:
+        catPhaseId = Types.ObjectId(constants.QUARTERS_PHASE_ID);
+        await this.createPhaseMatch(finalistTeams, catPhaseId);
+      break;
   
-      //Create fase of semifinal with 4 teams witch are not real
-      case 'semifinal':
-        catFaseId = '5ccbcf0c07863277340026fb';
-        finalistTeams = this.createList(4);      
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+      //Create phase of semifinal with 4 teams witch are not real
+      case 2:
+        catPhaseId = Types.ObjectId(constants.SEMIFINAL_PHASE_ID);
+        await this.createPhaseMatch(finalistTeams, catPhaseId);
+      break;
 
-      //Create fase of final with 2 teams witch are not real
-      case 'final':
-        catFaseId = '5ccbcf0c07863277340026fc';
-        await this.createFaseMatch(finalistTeams, catFaseId); 
+      //Create phase of final with 2 teams witch are not real
+      case 1:
+        catPhaseId = Types.ObjectId(constants.FINAL_PHASE_ID);
+        await this.createPhaseMatch(finalistTeams, catPhaseId); 
       break;
 
       default:
-        break;
+        return false;
     }
   }
 
   /**
-   * @name createList
+   * @name createPhaseMatch
    * @description this method create a fake list to make the matches
    * @param teams
    * @returns a list with the teams
    */
-  private createList(teams: number){
-    //Create the feak teams, only for make the matches
-    let listTeam = [];
-    for (let i = 0; i < teams; i++)
-      listTeam.push('team' + i);
-    return listTeam;
-  }
-
-  /**
-   * @name createFaseMatch
-   * @description this method create a fake list to make the matches
-   * @param teams
-   * @returns a list with the teams
-   */
-  private async createFaseMatch(finalListTeams, catFaseId){
-    //Create fase and matches
-    let object = { teamId: finalListTeams, tournamentId: this.tournamentId, catFaseId: catFaseId };
-    let newFase = new FaseSchema(object);
-    let faseCreated = await newFase.save();
-    let objectMatch = { teamOne: '', teamTwo: '', tournamentId: this.tournamentId, faseId: 'faseCreated._id' };
-
+  public async createPhaseMatch(finalListTeams, catPhaseId){
+    //Create phase and matches
+    let object = { teamId: finalListTeams, tournamentId: this.tournamentId, catPhaseId: catPhaseId };
+    let newPhase = new PhaseSchema(object);
+    let phaseCreated = await newPhase.save();
     for (let i = 0; i < finalListTeams.length / 2; i++) {
-      objectMatch.teamOne = finalListTeams[i];
-      objectMatch.teamTwo = finalListTeams[finalListTeams.length - i - 1];
+      let dataMatch = this.getPossibleDataMatch();
+      let objectMatch = {
+        teamOne: finalListTeams[i],
+        teamTwo: finalListTeams[finalListTeams.length - i - 1],
+        dateMatch: dataMatch.date,
+        court: dataMatch.court,
+      }
       let newMatch = new Match(objectMatch);
       await newMatch.save();
-      this.matchesCreated++;
     }
+  }
+
+    /**
+   * getPossibleDataMatch
+   * 
+   */
+  private getPossibleDataMatch() {
+
+
+    return {date: 'oneday', court: 'onecourt'}
+
   }
 
   /**
